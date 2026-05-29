@@ -76,11 +76,11 @@ class RegisterController extends Controller
     /**
      * Create a new user.
      *
-     * @param registerUserRequest $request
+        * @param RegisterUserRequest $request
      * @param string $membershipId
      * @return User
      */
-    protected function createUser(registerUserRequest $request, string $membershipId): User
+        protected function createUser(RegisterUserRequest $request, string $membershipId): User
     {
         $user = User::create([
             'first_name' => $request->first_name,
