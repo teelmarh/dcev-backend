@@ -21,20 +21,12 @@ class LoginController extends Controller
             return $this->errorResponse('Invalid credentials', 401);
         }
 
-        if ($user) {
-            if (!$user->paid) {
-                return $this->errorResponse('Your registration has not been completed. Please complete your registration to access your account.', 403);
-            }
+        if (! $user->hasVerifiedEmail()) {
+            return $this->errorResponse('Email not verified', 401);
         }
     
         $token = $user->createToken('auth_token', ['role:user'])->plainTextToken;
         
-        LoginHistory::create([
-            'user_id' => $user->id,
-            'logged_in_at' => now(),
-            'ip' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-        ]);
 
         $response = [
             'user' => new UserResource($user),

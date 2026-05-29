@@ -22,22 +22,8 @@ class RegisterUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string',
-            'middle_name' => 'nullable|string',
-            'last_name' => 'nullable|string',
             'email' => 'required|email|unique:users,email',
-            'state_chapter' => 'required|string',
-            'dob' => 'required|date',
-            'state_of_origin' => 'required|string',
-            'lga' => 'required|string',
-            'ward' => 'required|string',
-            'gender' => 'nullable|string',
-            'occupation' => 'required|string',
             'password' => 'nullable|min:8|confirmed',
-           'image' => 'nullable|base64image|base64max:5120',
-           'image_url' => 'nullable|string',
-            'phone' => 'nullable|string|unique:users,phone',
-            'disabled' => 'boolean',
         ];
     }
 }
