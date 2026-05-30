@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -13,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('nin', 11)->nullable()->unique();
+            $table->string('nin', 11)->nullable();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->string('middle_name')->nullable();
@@ -36,6 +37,9 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+
+        // Filtered unique index: only enforces uniqueness on non-NULL nin values (SQL Server compatible)
+        DB::statement('CREATE UNIQUE INDEX users_nin_unique ON users(nin) WHERE nin IS NOT NULL');
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
