@@ -2,7 +2,6 @@
 namespace App\Http\Controllers\Api\V1\Users\Auth;
 
 use App\Models\User;
-use App\Models\LoginHistory;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\Users\UserResource;

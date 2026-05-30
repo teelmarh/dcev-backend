@@ -26,11 +26,11 @@ class VerifyEmailController extends Controller
             return $this->errorResponse('OTP does not exist. Please resend a mail to verify your email', 409);
         }
 
-        if ($user->verified == true) {
+        if (!is_null($user->email_verified_at)) {
             return $this->errorResponse('Your emails is already verified', 409);
         }
 
-        $user->verified = true;
+        $user->email_verified_at = now();
 
         $user->save();
 

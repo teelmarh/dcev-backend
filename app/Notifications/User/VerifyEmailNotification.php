@@ -43,7 +43,7 @@ class VerifyEmailNotification extends Notification
         return (new CustomMailMessage($cmMgr))
             ->from($cmMgr->getEmail(), $cmMgr->getName())
             ->subject($cmMgr->getName().' OTP Verification')
-            ->greeting("Hello, {$this->user->first_name},")
+            ->greeting("Hello,")
             ->line('Welcome to '.$cmMgr->getName())
             ->line('We received a request to verify your email. Kindly use this OTP to login.')
             ->line(new HtmlString('<h1>'.$this->otp.'</h1>'))
