@@ -24,7 +24,7 @@ width: 100% !important;
 </style>
     <style>
         @php
-            $cssFile = resource_path('views/vendor/mail/html/themes/custom-mailer.css');
+            $cssFile = resource_path('views/components/custom-mailer/mail/html/themes/default.css');
             include(str_replace('/', DIRECTORY_SEPARATOR, $cssFile));
         @endphp
     </style>

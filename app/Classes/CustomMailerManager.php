@@ -22,10 +22,9 @@ class CustomMailerManager
 
     public function __construct()
     {
-        
-        $this->name = 'NCAA AVIORA-DCEV'; ';
-        $this->themeColor = '#008000';
-        $this->email = 'support@adc.com.ng';
+        $this->name = 'NCAA AVIORA-DCEV';
+        $this->themeColor = '#002b80';
+        $this->email = 'no-reply@dcev.ncaa.gov.ng';
         $this->logo = '';
         $this->logoHref = '#';
         $this->unsubscriptionUrl = '#';
