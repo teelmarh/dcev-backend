@@ -11,18 +11,18 @@ use App\Http\Controllers\Api\V1\System\HealthController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::prefix('v1')->group(function() {
+Route::prefix('v1')->group(function () {
     Route::apiResource('/health', HealthController::class)->only('index');
 
     Route::apiResource('/register', RegisterController::class)->only('store');
     Route::apiResource('/login', LoginController::class)->only('store');
     Route::apiResource('/send-token', SendTokenController::class)->only('store');
     Route::apiResource('/verify-email', VerifyEmailController::class)->only('store');
-    Route::apiResource('/reset-password', ResetPasswordController::class)->only('store');
     Route::apiResource('/forgot-password', ForgotPasswordController::class)->only('store');
+    Route::apiResource('/reset-password', ResetPasswordController::class)->only('store');
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/nin/verify', [NinVerificationController::class, 'store'])->name('nin.verify');
+        Route::apiResource('/nin/verify', NinVerificationController::class)->only('store');
     });
 });
 
