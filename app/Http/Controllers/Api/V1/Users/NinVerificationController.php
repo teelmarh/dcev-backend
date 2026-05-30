@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Api\V1\Users;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\NinVerificationRequest;
-use App\Http\Resources\Users\UserResource;
+use App\Http\Resources\Users\NinVerifiedResource;
 use App\Services\OneVerify\OneVerifyService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class NinVerificationController extends Controller
@@ -30,6 +31,10 @@ class NinVerificationController extends Controller
         try {
             $data = $this->oneVerify->lookupNin($request->nin);
         } catch (RuntimeException $e) {
+            Log::error('NIN verification failed', [
+                'nin'   => $request->nin,
+                'error' => $e->getMessage(),
+            ]);
             return $this->errorResponse('NIN verification failed. Please try again later.', 422);
         }
 
@@ -51,7 +56,7 @@ class NinVerificationController extends Controller
         return $this->successResponse([
             'success' => true,
             'message' => 'NIN verified successfully.',
-            'data'    => new UserResource($user),
+            'data'    => new NinVerifiedResource($user),
         ], 200);
     }
 
