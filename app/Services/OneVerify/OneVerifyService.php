@@ -37,12 +37,12 @@ class OneVerifyService
      */
     public function lookupNin(string $nin): array
     {
-        $response = $this->client()->post('/identity/nin', ['nin' => $nin]);
+        $response = $this->client()->post('/ninAuth/getNINDetails', ['nin' => $nin]);
 
         if ($response->status() === 401) {
             // Token may have expired server-side before TTL; force refresh and retry
             Cache::forget(self::TOKEN_CACHE_KEY);
-            $response = $this->client()->post('/identity/nin', ['nin' => $nin]);
+            $response = $this->client()->post('/ninAuth/getNINDetails', ['nin' => $nin]);
         }
 
         if ($response->failed()) {
