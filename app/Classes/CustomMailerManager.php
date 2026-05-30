@@ -23,7 +23,7 @@ class CustomMailerManager
     public function __construct()
     {
         
-        $this->name = 'ADC E-Membership';
+        $this->name = 'NCAA AVIORA-DCEV'; ';
         $this->themeColor = '#008000';
         $this->email = 'support@adc.com.ng';
         $this->logo = '';

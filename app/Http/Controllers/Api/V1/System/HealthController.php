@@ -15,13 +15,13 @@ class HealthController extends Controller
 
     public function index(): JsonResponse
     {
-        $endpoints = EndpointResource::collection($this->controllerRoutes())->resolve();
+        // $endpoints = EndpointResource::collection($this->controllerRoutes())->resolve();
 
         return $this->dataResponse([
             'status' => 'ok',
             'timestamp' => now()->toIso8601String(),
             'environment' => app()->environment(),
-            'endpoints' => $endpoints,
+            // 'endpoints' => $endpoints,
         ], 'Server is healthy.', true, 200);
     }
 
