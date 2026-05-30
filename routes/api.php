@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Users\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\Users\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\V1\Users\Auth\SendTokenController;
 use App\Http\Controllers\Api\V1\Users\Auth\VerifyEmailController;
+use App\Http\Controllers\Api\V1\Users\NinVerificationController;
 use App\Http\Controllers\Api\V1\System\HealthController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,5 +20,9 @@ Route::prefix('v1')->group(function() {
     Route::apiResource('/verify-email', VerifyEmailController::class)->only('store');
     Route::apiResource('/reset-password', ResetPasswordController::class)->only('store');
     Route::apiResource('/forgot-password', ForgotPasswordController::class)->only('store');
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/nin/verify', [NinVerificationController::class, 'store'])->name('nin.verify');
+    });
 });
 
