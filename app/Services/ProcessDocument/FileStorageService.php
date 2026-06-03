@@ -3,78 +3,77 @@
 namespace App\Services\ProcessDocument;
 
 use ErrorException;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Model;
 
 class FileStorageService
 {
-    public function fileStorage($file, Model $model): array
+    /**
+     * Store a multipart uploaded file on the public disk.
+     * Returns the relative file path.
+     */
+    public function storeUploadedFile(UploadedFile $file, Model $model): string
     {
-        $folderPath = $this->folderPath($model);
+        $folder   = $this->folderPath($model);
+        $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
 
-        Storage::disk('public')->makeDirectory($folderPath);
+        Storage::disk('public')->makeDirectory($folder);
+        Storage::disk('public')->putFileAs($folder, $file, $fileName);
 
-        // Parse the base64 image
-        $image_parts = explode(';base64,', $file);
-        if (count($image_parts) < 2) {
-            throw new ErrorException('Invalid base64 format');
-        }
-
-        $image_parts_ends = explode(',', $file);
-        $image_type = $this->getFileExtensionBase64($file);
-        $image_base64 = base64_decode($image_parts[1]);
-
-        $name = uniqid();
-        $fileName = $name.'.'.$image_type;
-        $filePath = $folderPath.$fileName;
-
-        Storage::disk('public')->put($filePath, $image_base64);
-
-        return [
-            'type' => $image_type,
-            'storage' => $filePath,
-            'image_type' => $image_type,
-            'name' => $name,
-            'base64_file' => $file,
-            'base64_type' => $image_parts_ends[0].',',
-        ];
+        return $folder . $fileName;
     }
 
-    public function folderPath($model): string
+    /**
+     * Store a base64 data URI on the public disk.
+     * Returns the relative file path.
+     */
+    public function storeBase64File(string $base64, Model $model): string
     {
-        if (! $model) {
-            throw new ErrorException('Sorry!!! Model Error');
+        // Parse: data:image/jpeg;base64,<data>
+        if (! str_contains($base64, ';base64,')) {
+            throw new ErrorException('Invalid base64 format — missing data URI header.');
         }
 
-        $baseFolder = rtrim(config('upload.folder', 'user'), '/');
+        [$header, $data] = explode(';base64,', $base64, 2);
+
+        // Extract extension from header (e.g. "data:image/jpeg" → "jpeg")
+        $mimeType  = str_replace('data:', '', $header);
+        $extension = $this->extensionFromMime($mimeType);
+
+        $decoded = base64_decode($data, strict: true);
+        if ($decoded === false) {
+            throw new ErrorException('Failed to decode base64 image data.');
+        }
+
+        $folder   = $this->folderPath($model);
+        $fileName = uniqid() . '.' . $extension;
+        $filePath = $folder . $fileName;
+
+        Storage::disk('public')->makeDirectory($folder);
+        Storage::disk('public')->put($filePath, $decoded);
+
+        return $filePath;
+    }
+
+    public function folderPath(Model $model): string
+    {
+        $base      = rtrim(config('filesystems.photo_folder', 'photos'), '/');
         $modelName = strtolower(class_basename($model));
 
-        $directory = "{$baseFolder}/{$modelName}/{$model->id}/";
-
-        return $directory;
+        return "{$base}/{$modelName}/{$model->id}/";
     }
 
-    public function folderPathWithoutModel(): string
+    private function extensionFromMime(string $mimeType): string
     {
-        $baseFolder = rtrim(config('upload.folder', 'user'), '/');
-
-        return "{$baseFolder}/random/";
-    }
-
-    public function getFileExtensionBase64($file): string
-    {
-        $mimeType = mime_content_type($file);
-        if (! $mimeType) {
-            throw new ErrorException('Sorry!!! Extension not found');
-        }
-
-        $parts = explode('/', $mimeType);
-
-        return $parts[1] ?? throw new ErrorException('Invalid mime type');
-    }
-
-    public function findFileExtension($file): string
-    {
-        return $file ? $file->getClientOriginalExtension() : throw new ErrorException('Original extension not found');
+        return match ($mimeType) {
+            'image/jpeg'    => 'jpg',
+            'image/png'     => 'png',
+            'image/gif'     => 'gif',
+            'image/webp'    => 'webp',
+            'image/bmp'     => 'bmp',
+            default         => throw new ErrorException("Unsupported image type: {$mimeType}"),
+        };
     }
 }
+
