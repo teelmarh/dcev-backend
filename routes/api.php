@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Users\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\V1\Users\Auth\SendTokenController;
 use App\Http\Controllers\Api\V1\Users\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\V1\Users\NinVerificationController;
+use App\Http\Controllers\Api\V1\Profile\ProfileController;
 use App\Http\Controllers\Api\V1\System\HealthController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,8 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('/nin/verify', NinVerificationController::class)->only('store');
+
+        Route::apiResource('/profile', ProfileController::class)->only(['index', 'store']);
     });
 });
 
