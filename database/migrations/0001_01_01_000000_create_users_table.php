@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('residence_lga')->nullable();
             $table->text('residence_address')->nullable();
             $table->text('nin_photo')->nullable();
+            $table->string('photo')->nullable();
             $table->boolean('nin_verified')->default(false);
             $table->timestamp('nin_verified_at')->nullable();
             $table->string('name')->nullable();
