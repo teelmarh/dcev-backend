@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1\Profile;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -13,50 +12,47 @@ use App\Http\Requests\User\Profile\UpdateProfileFormRequest;
 class ProfileController extends Controller
 {
     /**
-     * Get User profile details
-     *
-     * Get User profile details
+     * Get authenticated user's profile.
      */
     public function index(Request $request)
     {
         $user = $request->user();
 
-        $memberSince = Carbon::parse($user->created_at)->format('F Y');
-
-        $media = $user->media()->first();
-        $imageUrl = $media ? Storage::url($media->file_path) : null;
-
         $data = [
-            'user' => new UserResource($user),
-            'member_since' => $memberSince,
-            'status' => (bool) $user->is_active,
-            'image_url' => $imageUrl,
+            'user'         => new UserResource($user),
+            'member_since' => $user->created_at->format('F Y'),
+            'photo_url'    => $user->photo ? Storage::disk('public')->url($user->photo) : null,
         ];
-        
+
         return $this->dataResponse($data, 'User data fetched successfully', true, 200);
     }
 
     /**
-     * Update User profile
-     *
-     * Update User profile
+     * Update authenticated user's profile.
+     * Accepts photo as multipart file (image_file) or base64 data URI (image).
      */
     public function store(UpdateProfileFormRequest $request)
     {
-        $user = $request->user();
-        
-   
+        $user       = $request->user();
+        $updateData = collect($request->validated())
+            ->except(['image', 'image_file'])
+            ->filter(fn ($v) => ! is_null($v))
+            ->toArray();
 
-        $updateData = $request->validated();
+        $imageInput = $request->file('image_file') ?? $request->input('image');
 
-        if ($request->image) {
-            $imagePath = app(ProcessMediaService::class)->processImage($request->image, $user);
-            $updateData['image_url'] = \Storage::url($imagePath);
+        if ($imageInput) {
+            $path                = app(ProcessMediaService::class)->processImage($imageInput, $user);
+            $updateData['photo'] = $path;
         }
 
-        unset($updateData['image']);
         $user->update($updateData);
-        
-        return $this->dataResponse($user, 'User data Updated successfully', true, 200);
+
+        return $this->dataResponse(
+            new UserResource($user->fresh()),
+            'Profile updated successfully',
+            true,
+            200
+        );
     }
 }
