@@ -29,6 +29,9 @@ return new class extends Migration
             $table->text('residence_address')->nullable();
             $table->text('nin_photo')->nullable();
             $table->string('photo')->nullable();
+            $table->unsignedBigInteger('empic_customer_no')->nullable();
+            $table->unsignedBigInteger('empic_address_id')->nullable();
+            $table->boolean('empic_synced')->default(false);
             $table->boolean('nin_verified')->default(false);
             $table->timestamp('nin_verified_at')->nullable();
             $table->string('name')->nullable();

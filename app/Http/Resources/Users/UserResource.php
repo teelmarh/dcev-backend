@@ -21,10 +21,13 @@ class UserResource extends JsonResource
             'phone'            => $this->phone,
             'gender'           => $this->gender,
             'photo'            => $this->photo ? Storage::disk('public')->url($this->photo) : null,
-            'nin'              => $this->nin,
-            'nin_verified'     => $this->nin_verified,
-            'nin_verified_at'  => $this->nin_verified_at,
-            'created_at'       => $this->created_at,
+            'nin'                => $this->nin,
+            'nin_verified'       => $this->nin_verified,
+            'nin_verified_at'    => $this->nin_verified_at,
+            'empic_synced'       => $this->empic_synced,
+            'empic_customer_no'  => $this->empic_customer_no,
+            'empic_address_id'   => $this->empic_address_id,
+            'created_at'         => $this->created_at,
         ];
     }
 }
