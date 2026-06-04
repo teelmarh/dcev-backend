@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\V1\Users\Auth\SendTokenController;
 use App\Http\Controllers\Api\V1\Users\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\V1\Users\NinVerificationController;
 use App\Http\Controllers\Api\V1\Profile\ProfileController;
+use App\Http\Controllers\Api\V1\Empic\EmpicHumanController;
+use App\Http\Controllers\Api\V1\Empic\EmpicAddressController;
 use App\Http\Controllers\Api\V1\System\HealthController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +28,9 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('/nin/verify', NinVerificationController::class)->only('store');
 
         Route::apiResource('/profile', ProfileController::class)->only(['index', 'store']);
+
+        Route::post('/empic/human', [EmpicHumanController::class, 'store']);
+        Route::post('/empic/address', [EmpicAddressController::class, 'store']);
     });
 });
 
