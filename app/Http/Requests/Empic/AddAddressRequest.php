@@ -14,6 +14,7 @@ class AddAddressRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'user_id'     => 'required|integer|exists:users,id',
             'city'        => 'required|string|max:255',
             'street_name' => 'nullable|string|max:255',
             'street_no'   => 'nullable|string|max:50',

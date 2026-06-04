@@ -29,8 +29,8 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('/profile', ProfileController::class)->only(['index', 'store']);
 
-        Route::post('/empic/human', [EmpicHumanController::class, 'store']);
-        Route::post('/empic/address', [EmpicAddressController::class, 'store']);
+        Route::apiResource('/empic/human', EmpicHumanController::class)->only('store');
+        Route::apiResource('/empic/address', EmpicAddressController::class)->only('store');
     });
 });
 

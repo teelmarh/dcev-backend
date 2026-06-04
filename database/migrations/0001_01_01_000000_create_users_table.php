@@ -32,6 +32,7 @@ return new class extends Migration
             $table->unsignedBigInteger('empic_customer_no')->nullable();
             $table->unsignedBigInteger('empic_address_id')->nullable();
             $table->boolean('empic_synced')->default(false);
+            $table->string('empic_status')->nullable();
             $table->boolean('nin_verified')->default(false);
             $table->timestamp('nin_verified_at')->nullable();
             $table->string('name')->nullable();

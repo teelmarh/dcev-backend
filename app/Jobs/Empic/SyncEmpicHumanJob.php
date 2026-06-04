@@ -10,66 +10,54 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 class SyncEmpicHumanJob implements ShouldQueue
 {
-    use Queueable, InteractsWithQueue, SerializesModels;
+    use Queueable, InteractsWithQueue;
 
-    /**
-     * Maximum attempts before the job is marked as failed.
-     * 4xx errors short-circuit and do not consume all attempts.
-     */
     public int $tries = 3;
 
-    /**
-     * Seconds to wait before retrying (exponential-ish).
-     */
     public array $backoff = [60, 120, 300];
 
-    public function __construct(public readonly User $user) {}
+    public function __construct(public readonly int $userId) {}
 
-    /**
-     * Prevent overlapping jobs for the same user.
-     */
     public function middleware(): array
     {
-        return [new WithoutOverlapping($this->user->id)];
+        return [new WithoutOverlapping($this->userId)];
     }
 
     public function handle(EmpicCmService $empic): void
     {
-        if ($this->user->empic_customer_no) {
-            // Already registered — skip silently
+        $user = User::findOrFail($this->userId);
+
+        if ($user->empic_customer_no) {
             return;
         }
 
         try {
-            $customerNo = $empic->createHuman($this->user);
+            $customerNo = $empic->createHuman($user);
         } catch (EmpicUnavailableException $e) {
-            Log::warning('EMPIC unavailable during createHuman — will retry', [
-                'user_id' => $this->user->id,
+            Log::warning('EMPIC unavailable during createHuman � will retry', [
+                'user_id' => $this->userId,
                 'error'   => $e->getMessage(),
                 'attempt' => $this->attempts(),
             ]);
-            // Re-throw so the queue retries
             throw $e;
         } catch (EmpicApiException $e) {
-            Log::error('EMPIC rejected createHuman payload — no retry', [
-                'user_id' => $this->user->id,
+            Log::error('EMPIC rejected createHuman payload � no retry', [
+                'user_id' => $this->userId,
                 'error'   => $e->getMessage(),
                 'context' => $e->context,
             ]);
-            // Bad input won't fix itself — release without retrying
             $this->fail($e);
             return;
         }
 
-        $this->user->update(['empic_customer_no' => $customerNo]);
+        $user->update(['empic_customer_no' => $customerNo]);
 
         Log::info('EMPIC createHuman succeeded', [
-            'user_id'     => $this->user->id,
+            'user_id'     => $this->userId,
             'customer_no' => $customerNo,
         ]);
     }
@@ -77,8 +65,10 @@ class SyncEmpicHumanJob implements ShouldQueue
     public function failed(\Throwable $e): void
     {
         Log::error('SyncEmpicHumanJob permanently failed', [
-            'user_id' => $this->user->id,
+            'user_id' => $this->userId,
             'error'   => $e->getMessage(),
         ]);
+
+        User::where('id', $this->userId)->update(['empic_status' => 'failed']);
     }
 }

@@ -10,56 +10,54 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 class SyncEmpicAddressJob implements ShouldQueue
 {
-    use Queueable, InteractsWithQueue, SerializesModels;
+    use Queueable, InteractsWithQueue;
 
     public int $tries = 3;
 
     public array $backoff = [60, 120, 300];
 
     public function __construct(
-        public readonly User  $user,
+        public readonly int   $userId,
         public readonly array $addressData,
     ) {}
 
     public function middleware(): array
     {
-        return [new WithoutOverlapping('empic-address-' . $this->user->id)];
+        return [new WithoutOverlapping('empic-address-' . $this->userId)];
     }
 
     public function handle(EmpicCmService $empic): void
     {
-        if ($this->user->empic_address_id) {
-            // Already added — skip silently
+        $user = User::findOrFail($this->userId);
+
+        if ($user->empic_address_id) {
             return;
         }
 
-        if (! $this->user->empic_customer_no) {
-            Log::warning('SyncEmpicAddressJob: user has no customerNo — cannot add address', [
-                'user_id' => $this->user->id,
+        if (! $user->empic_customer_no) {
+            Log::warning('SyncEmpicAddressJob: user has no customerNo � cannot add address', [
+                'user_id' => $this->userId,
             ]);
-            // Do not retry — human sync must happen first
-            $this->fail(new \RuntimeException('No empic_customer_no on user ' . $this->user->id));
+            $this->fail(new \RuntimeException('No empic_customer_no on user ' . $this->userId));
             return;
         }
 
         try {
-            $addressId = $empic->addAddress((int) $this->user->empic_customer_no, $this->addressData);
+            $addressId = $empic->addAddress((int) $user->empic_customer_no, $this->addressData);
         } catch (EmpicUnavailableException $e) {
-            Log::warning('EMPIC unavailable during addAddress — will retry', [
-                'user_id'     => $this->user->id,
-                'customer_no' => $this->user->empic_customer_no,
-                'error'       => $e->getMessage(),
-                'attempt'     => $this->attempts(),
+            Log::warning('EMPIC unavailable during addAddress � will retry', [
+                'user_id' => $this->userId,
+                'error'   => $e->getMessage(),
+                'attempt' => $this->attempts(),
             ]);
             throw $e;
         } catch (EmpicApiException $e) {
-            Log::error('EMPIC rejected addAddress payload — no retry', [
-                'user_id' => $this->user->id,
+            Log::error('EMPIC rejected addAddress payload � no retry', [
+                'user_id' => $this->userId,
                 'error'   => $e->getMessage(),
                 'context' => $e->context,
             ]);
@@ -67,13 +65,14 @@ class SyncEmpicAddressJob implements ShouldQueue
             return;
         }
 
-        $this->user->update([
+        $user->update([
             'empic_address_id' => $addressId,
             'empic_synced'     => true,
+            'empic_status'     => 'synced',
         ]);
 
         Log::info('EMPIC addAddress succeeded', [
-            'user_id'    => $this->user->id,
+            'user_id'    => $this->userId,
             'address_id' => $addressId,
         ]);
     }
@@ -81,8 +80,10 @@ class SyncEmpicAddressJob implements ShouldQueue
     public function failed(\Throwable $e): void
     {
         Log::error('SyncEmpicAddressJob permanently failed', [
-            'user_id' => $this->user->id,
+            'user_id' => $this->userId,
             'error'   => $e->getMessage(),
         ]);
+
+        User::where('id', $this->userId)->update(['empic_status' => 'failed']);
     }
 }

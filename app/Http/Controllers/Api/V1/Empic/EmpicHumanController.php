@@ -3,30 +3,36 @@
 namespace App\Http\Controllers\Api\V1\Empic;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Empic\EmpicHumanRequest;
 use App\Jobs\Empic\SyncEmpicHumanJob;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class EmpicHumanController extends Controller
 {
     /**
-     * Dispatch the EMPIC createHuman job for the authenticated user.
+     * Queue CM human registration for a specified user (admin action).
      *
      * Guards:
-     *  - User must have completed NIN verification (nin_verified = true)
-     *  - User must not already have an empic_customer_no (idempotent — avoids duplicate CM records)
+     *  - Target user must have completed NIN verification
+     *  - Target user must not already have an empic_customer_no
      */
-    public function store(Request $request): JsonResponse
+    public function store(EmpicHumanRequest $request): JsonResponse
     {
-        /** @var \App\Models\User $user */
-        $user = $request->user();
+        $user = User::findOrFail($request->validated('user_id'));
+
+        if (! $user->nin_verified) {
+            return $this->errorResponse('NIN verification must be completed before registering with EMPIC.', 422);
+        }
 
         if ($user->empic_customer_no) {
             return $this->errorResponse('This account is already registered in the EMPIC CM system.', 409);
         }
 
-        SyncEmpicHumanJob::dispatch($user);
+        $user->update(['empic_status' => 'pending']);
 
-        return $this->showMessage('CM registration queued. You will be notified once it is complete.');
+        SyncEmpicHumanJob::dispatch($user->id);
+
+        return $this->showMessage('CM human registration queued.');
     }
 }
