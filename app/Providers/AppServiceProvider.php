@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Empic\EmpicCmService;
 use App\Services\OneVerify\OneVerifyService;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,6 +14,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(OneVerifyService::class);
+        $this->app->singleton(EmpicCmService::class);
     }
 
     /**
