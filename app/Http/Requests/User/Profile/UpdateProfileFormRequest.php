@@ -24,17 +24,14 @@ class UpdateProfileFormRequest extends FormRequest
     public function rules()
     {
         return [
-            'first_name'  => 'nullable|string',
-            'middle_name' => 'nullable|string',
-            'last_name'   => 'nullable|string',
-            'email'       => 'nullable|email|unique:users,email,' . $this->user()->id,
-            'phone'       => 'nullable|string|unique:users,phone,' . $this->user()->id,
-            'gender'      => 'nullable|in:m,f',
-            'password'    => 'nullable|min:8|confirmed',
+            'email'      => 'nullable|email|unique:users,email,' . $this->user()->id,
+            'phone'      => 'nullable|string|unique:users,phone,' . $this->user()->id,
+            'gender'     => 'nullable|in:m,f',
+            'password'   => 'nullable|min:8|confirmed',
 
             // Accept either a multipart file or a base64 data URI string
-            'image'       => 'nullable',
-            'image_file'  => 'nullable|image|max:5120',  // multipart key
+            'image'      => 'nullable',
+            'image_file' => 'nullable|image|max:5120',
         ];
     }
 

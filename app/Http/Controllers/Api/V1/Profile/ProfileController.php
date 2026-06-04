@@ -30,12 +30,13 @@ class ProfileController extends Controller
     /**
      * Update authenticated user's profile.
      * Accepts photo as multipart file (image_file) or base64 data URI (image).
+     * Name fields and date_of_birth are set by NIN verification and cannot be changed here.
      */
     public function store(UpdateProfileFormRequest $request)
     {
         $user       = $request->user();
         $updateData = collect($request->validated())
-            ->except(['image', 'image_file'])
+            ->except(['image', 'image_file', 'first_name', 'last_name', 'middle_name', 'date_of_birth'])
             ->filter(fn ($v) => ! is_null($v))
             ->toArray();
 
