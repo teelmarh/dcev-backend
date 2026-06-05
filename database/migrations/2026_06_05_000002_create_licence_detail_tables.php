@@ -80,17 +80,11 @@ return new class extends Migration
         Schema::create('licence_ame_details', function (Blueprint $table) use ($addSharedColumns) {
             $addSharedColumns($table);
             // Ratings by discipline (comma-separated sub-ratings within each group)
-            // Airframe: airframe, unpressurized_metal_airframe, pressurized_metal_airframe, basic_helicopter_airframe
             $table->string('airframe_ratings')->nullable();
-            // Powerplant: powerplant, piston_engine, gas_turbine_engine, others
             $table->string('powerplant_ratings')->nullable();
-            // Avionics: avionics, dc_electrics, ac_electrics_frequency_wild, ac_electrics_constant_frequency,
-            //           aircraft_general_instrument, autopilot, airborne_radio_radar,
-            //           direct_reading_compass, remote_reading_compass
             $table->string('avionics_ratings')->nullable();
             $table->string('aircraft_types')->nullable();
             $table->text('scope_of_work')->nullable();
-            // Employment information (blocks P, Q, R on the AMEL form)
             $table->string('employer_name')->nullable();
             $table->string('employer_city_state')->nullable();
             $table->string('employed_as')->nullable(); // Engineer | Technician | OJT | Others
