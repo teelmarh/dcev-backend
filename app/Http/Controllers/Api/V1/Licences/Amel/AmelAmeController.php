@@ -23,7 +23,11 @@ class AmelAmeController extends Controller
 
             $licence->ameDetail()->create(array_merge(
                 $request->sharedDetailData(),
-                $request->safe()->only(['categories', 'aircraft_types', 'scope_of_work'])
+                $request->safe()->only([
+                    'airframe_ratings', 'powerplant_ratings', 'avionics_ratings',
+                    'aircraft_types', 'scope_of_work',
+                    'employer_name', 'employer_city_state', 'employed_as',
+                ])
             ));
 
             return $licence;
