@@ -68,6 +68,10 @@ abstract class StoreLicenceRequest extends FormRequest
             'foreign_licence_grade'  => 'nullable|string|max:100',
             'foreign_licence_number' => 'nullable|string|max:100',
             'foreign_ratings'        => 'nullable|string|max:255',
+
+            // Uploaded documents
+            'licence_document' => 'nullable|file|mimes:pdf|max:10240',     // max 10 MB
+            'passport_photo'   => 'nullable|file|mimes:jpeg,jpg,png|max:5120', // max 5 MB
         ];
     }
 
@@ -92,6 +96,16 @@ abstract class StoreLicenceRequest extends FormRequest
         if ($user->nin_verified) {
             $data['id_form']   = 'NIN';
             $data['id_number'] = $data['id_number'] ?? $user->nin;
+        }
+
+        if ($this->hasFile('licence_document')) {
+            $data['licence_document_path'] = $this->file('licence_document')
+                ->store("licences/{$user->id}/documents", 'local');
+        }
+
+        if ($this->hasFile('passport_photo')) {
+            $data['passport_photo_path'] = $this->file('passport_photo')
+                ->store("licences/{$user->id}/photos", 'local');
         }
 
         return $data;

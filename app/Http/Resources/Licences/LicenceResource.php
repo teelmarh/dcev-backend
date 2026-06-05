@@ -4,6 +4,7 @@ namespace App\Http\Resources\Licences;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class LicenceResource extends JsonResource
 {
@@ -45,6 +46,14 @@ class LicenceResource extends JsonResource
             // identification
             'id_form'   => $this->id_form,
             'id_number' => $this->id_number,
+
+            // uploaded documents
+            'licence_document_url' => $this->licence_document_path
+                ? Storage::disk('local')->url($this->licence_document_path)
+                : null,
+            'passport_photo_url' => $this->passport_photo_path
+                ? Storage::disk('local')->url($this->passport_photo_path)
+                : null,
 
             'detail' => $this->whenLoaded($detailRelation, fn () => $this->{$detailRelation}),
 
