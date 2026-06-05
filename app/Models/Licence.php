@@ -20,6 +20,7 @@ class Licence extends Model
     protected function casts(): array
     {
         return [
+            'user_id'                      => 'integer',
             'initial_issue_date'           => 'date',
             'last_renewal_date'            => 'date',
             'expiry_date'                  => 'date',
