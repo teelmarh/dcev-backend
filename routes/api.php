@@ -11,6 +11,14 @@ use App\Http\Controllers\Api\V1\Profile\ProfileController;
 use App\Http\Controllers\Api\V1\Empic\EmpicHumanController;
 use App\Http\Controllers\Api\V1\Empic\EmpicAddressController;
 use App\Http\Controllers\Api\V1\System\HealthController;
+use App\Http\Controllers\Api\V1\Licences\LicenceController;
+use App\Http\Controllers\Api\V1\Licences\Fcl\FclPilotController;
+use App\Http\Controllers\Api\V1\Licences\Fcl\FclCabinCrewController;
+use App\Http\Controllers\Api\V1\Licences\Fcl\FclFlightDispatchController;
+use App\Http\Controllers\Api\V1\Licences\Ans\AnsAtcController;
+use App\Http\Controllers\Api\V1\Licences\Ans\AnsAtsepController;
+use App\Http\Controllers\Api\V1\Licences\Ans\AnsAsoController;
+use App\Http\Controllers\Api\V1\Licences\Amel\AmelAmeController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -29,8 +37,23 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('/profile', ProfileController::class)->only(['index', 'store']);
 
-        Route::apiResource('/empic/human', EmpicHumanController::class)->only('store');
-        Route::apiResource('/empic/address', EmpicAddressController::class)->only('store');
+        Route::post('/empic/human', [EmpicHumanController::class, 'store']);
+        Route::post('/empic/address', [EmpicAddressController::class, 'store']);
+
+        Route::prefix('licences')->group(function () {
+            Route::get('/', [LicenceController::class, 'index']);
+            Route::get('/{licence}', [LicenceController::class, 'show']);
+
+            Route::post('/fcl/pilot', [FclPilotController::class, 'store']);
+            Route::post('/fcl/cabin-crew', [FclCabinCrewController::class, 'store']);
+            Route::post('/fcl/dispatch', [FclFlightDispatchController::class, 'store']);
+
+            Route::post('/ans/atc', [AnsAtcController::class, 'store']);
+            Route::post('/ans/atsep', [AnsAtsepController::class, 'store']);
+            Route::post('/ans/aso', [AnsAsoController::class, 'store']);
+
+            Route::post('/amel/ame', [AmelAmeController::class, 'store']);
+        });
     });
 });
 
