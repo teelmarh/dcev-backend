@@ -100,12 +100,12 @@ abstract class StoreLicenceRequest extends FormRequest
 
         if ($this->hasFile('licence_document')) {
             $data['licence_document_path'] = $this->file('licence_document')
-                ->store("licences/{$user->id}/documents", 'local');
+                ->store("licences/{$user->id}/documents", 'public');
         }
 
         if ($this->hasFile('passport_photo')) {
             $data['passport_photo_path'] = $this->file('passport_photo')
-                ->store("licences/{$user->id}/photos", 'local');
+                ->store("licences/{$user->id}/photos", 'public');
         }
 
         return $data;
