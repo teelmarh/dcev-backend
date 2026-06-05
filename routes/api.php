@@ -43,6 +43,8 @@ Route::prefix('v1')->group(function () {
         Route::prefix('licences')->group(function () {
             Route::get('/', [LicenceController::class, 'index']);
             Route::get('/{licence}', [LicenceController::class, 'show']);
+            Route::get('/{licence}/document', [LicenceController::class, 'downloadDocument']);
+            Route::get('/{licence}/photo', [LicenceController::class, 'downloadPhoto']);
 
             Route::post('/fcl/pilot', [FclPilotController::class, 'store']);
             Route::post('/fcl/cabin-crew', [FclCabinCrewController::class, 'store']);

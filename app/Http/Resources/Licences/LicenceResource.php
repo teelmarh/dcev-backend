@@ -46,12 +46,12 @@ class LicenceResource extends JsonResource
             'id_form'   => $this->id_form,
             'id_number' => $this->id_number,
 
-            // uploaded documents
+            // uploaded documents (download via authenticated endpoint)
             'licence_document_url' => $this->licence_document_path
-                ? rtrim(config('app.url'), '/') . '/storage/' . $this->licence_document_path
+                ? rtrim(config('app.url'), '/') . '/api/v1/licences/' . $this->id . '/document'
                 : null,
             'passport_photo_url' => $this->passport_photo_path
-                ? rtrim(config('app.url'), '/') . '/storage/' . $this->passport_photo_path
+                ? rtrim(config('app.url'), '/') . '/api/v1/licences/' . $this->id . '/photo'
                 : null,
 
             'detail' => $this->whenLoaded($detailRelation, fn () => $this->{$detailRelation}),
