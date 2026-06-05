@@ -36,6 +36,7 @@ class AmelAmeController extends Controller
         return $this->dataResponse(
             new LicenceResource($licence->load('ameDetail')),
             'AME licence record saved.',
+            true,
             201
         );
     }

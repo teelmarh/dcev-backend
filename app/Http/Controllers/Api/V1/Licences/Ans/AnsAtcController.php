@@ -32,6 +32,7 @@ class AnsAtcController extends Controller
         return $this->dataResponse(
             new LicenceResource($licence->load('atcDetail')),
             'ATC licence record saved.',
+            true,
             201
         );
     }

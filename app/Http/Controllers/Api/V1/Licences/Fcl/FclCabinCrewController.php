@@ -32,6 +32,7 @@ class FclCabinCrewController extends Controller
         return $this->dataResponse(
             new LicenceResource($licence->load('cabinCrewDetail')),
             'Cabin crew licence record saved.',
+            true,
             201
         );
     }

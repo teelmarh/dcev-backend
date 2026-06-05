@@ -32,6 +32,7 @@ class FclFlightDispatchController extends Controller
         return $this->dataResponse(
             new LicenceResource($licence->load('flightDispatchDetail')),
             'Flight dispatch licence record saved.',
+            true,
             201
         );
     }

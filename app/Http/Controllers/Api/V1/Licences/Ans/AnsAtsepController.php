@@ -32,6 +32,7 @@ class AnsAtsepController extends Controller
         return $this->dataResponse(
             new LicenceResource($licence->load('atsepDetail')),
             'ATSEP licence record saved.',
+            true,
             201
         );
     }

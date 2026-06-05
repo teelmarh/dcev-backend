@@ -40,6 +40,6 @@ class LicenceController extends Controller
 
         $licence->load($licence->detailRelationName());
 
-        return $this->dataResponse(new LicenceResource($licence));
+        return $this->dataResponse(new LicenceResource($licence), 'Licence retrieved.', true, 200);
     }
 }

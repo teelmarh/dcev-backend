@@ -32,6 +32,7 @@ class AnsAsoController extends Controller
         return $this->dataResponse(
             new LicenceResource($licence->load('asoDetail')),
             'ASO licence record saved.',
+            true,
             201
         );
     }
