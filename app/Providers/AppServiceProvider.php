@@ -3,17 +3,18 @@
 namespace App\Providers;
 
 use App\Services\Empic\EmpicCmService;
+use App\Services\OneVerify\MockOneVerifyService;
 use App\Services\OneVerify\OneVerifyService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        $this->app->singleton(OneVerifyService::class);
+        $this->app->singleton(
+            OneVerifyService::class,
+            config('app.nin_mock') ? MockOneVerifyService::class : OneVerifyService::class
+        );
         $this->app->singleton(EmpicCmService::class);
     }
 

@@ -41,6 +41,8 @@ return [
 
     'debug' => (bool) env('APP_DEBUG', false),
 
+    'nin_mock' => (bool) env('NIN_MOCK', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application URL
