@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('licence_id')->constrained()->cascadeOnDelete();
 
             $table->date('knowledge_test_date')->nullable();
+            $table->string('knowledge_test_for')->nullable(); // which licence/rating the test was for
 
             $table->date('skill_test_date')->nullable();
             $table->string('skill_test_aircraft')->nullable();

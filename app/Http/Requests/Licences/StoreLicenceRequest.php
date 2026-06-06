@@ -52,6 +52,7 @@ abstract class StoreLicenceRequest extends FormRequest
 
             // --- Training / basis (Section II) ---
             'knowledge_test_date'    => 'nullable|date',
+            'knowledge_test_for'     => 'nullable|string|max:100',
             'skill_test_date'        => 'nullable|date',
             'skill_test_aircraft'    => 'nullable|string|max:100',
             'skill_test_total_time'  => 'nullable|string|max:50',
@@ -117,7 +118,8 @@ abstract class StoreLicenceRequest extends FormRequest
     public function sharedDetailData(): array
     {
         return $this->safe()->only([
-            'knowledge_test_date', 'skill_test_date', 'skill_test_aircraft', 'skill_test_total_time',
+            'knowledge_test_date', 'knowledge_test_for',
+            'skill_test_date', 'skill_test_aircraft', 'skill_test_total_time',
             'ato_name', 'ato_location', 'ato_number', 'ato_course', 'ato_graduation_date',
             'foreign_country', 'foreign_licence_grade', 'foreign_licence_number', 'foreign_ratings',
         ]);
