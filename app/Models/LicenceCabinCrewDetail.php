@@ -12,11 +12,14 @@ class LicenceCabinCrewDetail extends Model
     protected function casts(): array
     {
         return [
-            'knowledge_test_date' => 'date',
-            'skill_test_date'     => 'date',
-            'ato_graduation_date' => 'date',
-            'valid_from'          => 'date',
-            'valid_to'            => 'date',
+            'knowledge_test_date'  => 'date',
+            'skill_test_date'      => 'date',
+            'ato_graduation_date'  => 'date',
+            'valid_from'           => 'date',
+            'valid_to'             => 'date',
+            'last_evacuation_date' => 'date',
+            'last_ditching_date'   => 'date',
+            'last_fire_drill_date' => 'date',
         ];
     }
 

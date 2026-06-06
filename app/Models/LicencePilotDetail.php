@@ -12,11 +12,12 @@ class LicencePilotDetail extends Model
     protected function casts(): array
     {
         return [
-            'knowledge_test_date' => 'date',
-            'skill_test_date'     => 'date',
-            'ato_graduation_date' => 'date',
-            'ratings'             => 'array',
-            'aircraft_categories' => 'array',
+            'knowledge_test_date'  => 'date',
+            'skill_test_date'      => 'date',
+            'ato_graduation_date'  => 'date',
+            'military_date_rated'  => 'date',
+            'ratings'              => 'array',
+            'aircraft_categories'  => 'array',
         ];
     }
 

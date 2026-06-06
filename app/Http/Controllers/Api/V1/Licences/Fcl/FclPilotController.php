@@ -23,7 +23,11 @@ class FclPilotController extends Controller
 
             $licence->pilotDetail()->create(array_merge(
                 $request->sharedDetailData(),
-                $request->safe()->only(['ratings', 'aircraft_categories', 'endorsements'])
+                $request->safe()->only([
+                    'ratings', 'aircraft_categories', 'endorsements',
+                    'skill_test_pic_time',
+                    'military_service', 'military_date_rated', 'military_rank_grade',
+                ])
             ));
 
             return $licence;

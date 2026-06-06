@@ -23,7 +23,10 @@ class FclCabinCrewController extends Controller
 
             $licence->cabinCrewDetail()->create(array_merge(
                 $request->sharedDetailData(),
-                $request->safe()->only(['operator', 'aircraft_types', 'valid_from', 'valid_to'])
+                $request->safe()->only([
+                    'operator', 'aircraft_types', 'valid_from', 'valid_to',
+                    'last_evacuation_date', 'last_ditching_date', 'last_fire_drill_date',
+                ])
             ));
 
             return $licence;

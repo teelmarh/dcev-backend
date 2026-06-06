@@ -40,6 +40,12 @@ return new class extends Migration
             $table->string('ratings')->nullable();
             $table->string('aircraft_categories')->nullable();
             $table->text('endorsements')->nullable();
+            // Skill test — pilot-in-command time (O-PEL 001 Section III.B.3)
+            $table->string('skill_test_pic_time')->nullable();
+            // Military qualifications basis (O-PEL 001 Section III.E)
+            $table->string('military_service')->nullable();       // Navy | Airforce | Army
+            $table->date('military_date_rated')->nullable();
+            $table->string('military_rank_grade')->nullable();    // rank, grade and service number
         });
 
         // FCL — Cabin Crew
@@ -49,6 +55,10 @@ return new class extends Migration
             $table->string('aircraft_types')->nullable();
             $table->date('valid_from')->nullable();
             $table->date('valid_to')->nullable();
+            // Emergency drill dates (O-PEL 016 Section III)
+            $table->date('last_evacuation_date')->nullable();
+            $table->date('last_ditching_date')->nullable();
+            $table->date('last_fire_drill_date')->nullable();
         });
 
         // FCL — Flight Dispatch
