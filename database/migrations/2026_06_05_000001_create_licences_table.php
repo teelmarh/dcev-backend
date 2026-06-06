@@ -46,7 +46,7 @@ return new class extends Migration
             $table->string('id_form')->nullable();
             $table->string('id_number')->nullable();
 
-            // Uploaded documents (stored on local private disk)
+            // Uploaded documents,;/
             $table->string('licence_document_path')->nullable();
             $table->string('passport_photo_path')->nullable();
 
