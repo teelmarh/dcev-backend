@@ -1,190 +1,237 @@
-/* Base */
+/* =========================================================
+   DCEV Mail Theme — African Geometric Edition
+   ========================================================= */
 
+/* Palette — source: CustomMailerManager::getThemeColor() = #002b80
+   --blue-dark  : #002b80
+   --blue-mid   : #1a3a9e
+   --blue-muted : #8fa8d8
+   --gold       : #C9A84C
+   --gold-light : #E8C97A
+   --cream      : #FAF7F0
+   --ink        : #1A1A2E
+   --muted      : #6B7280
+*/
+
+/* Base */
 body,
 body *:not(html):not(style):not(br):not(tr):not(code) {
     box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     position: relative;
 }
 
 body {
     -webkit-text-size-adjust: none;
-    background-color: #ffffff;
-    color: #363740;
+    background-color: #F3EFE6;
+    color: #1A1A2E;
     height: 100%;
-    line-height: 1.4;
+    line-height: 1.35;
     margin: 0;
     padding: 0;
     width: 100% !important;
 }
 
+/* Typography */
 p {
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px;
-    font-weight: normal;
-    margin: 0;
-    margin-bottom: 15px;
-}
-
-ul,
-ol,
-blockquote {
-    line-height: 1.4;
+    font-size: 15px;
+    line-height: 1.55;
+    margin: 0 0 10px 0;
+    color: #1A1A2E;
     text-align: left;
 }
 
-a {
-    color: #3869d4;
-}
-
-a img {
-    border: none;
-}
-
-/* Typography */
+p.sub { font-size: 12px; color: #6B7280; }
 
 h1 {
-    color: #3d4852;
-    font-size: 18px;
-    font-weight: bold;
-    margin-top: 0;
+    color: #002b80;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
     text-align: left;
+    letter-spacing: -0.3px;
 }
 
 h2 {
     font-size: 16px;
-    font-weight: bold;
-    margin-top: 0;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    color: #1a3a9e;
     text-align: left;
 }
 
 h3 {
     font-size: 14px;
-    font-weight: bold;
-    margin-top: 0;
+    font-weight: 600;
+    margin: 0 0 4px 0;
     text-align: left;
 }
 
-p {
-    font-size: 16px;
-    line-height: 1.5em;
-    margin-top: 0;
+ul, ol, blockquote {
+    line-height: 1.5;
     text-align: left;
+    margin: 0 0 10px 0;
 }
 
-p.sub {
-    font-size: 12px;
-}
+a { color: #1a3a9e; }
+a img { border: none; }
+img { max-width: 100%; }
 
-img {
-    max-width: 100%;
-}
-
-/* Layout */
-
-.wrapperx {
-    -premailer-cellpadding: 0;
-    -premailer-cellspacing: 0;
-    -premailer-width: 100%;
-    background-color: #ffffff;
+/* ── Outer wrapper ── */
+.wrapper {
+    background-color: #F3EFE6;
+    width: 100%;
     margin: 0;
-    padding: 0;
+    padding: 20px 0;
+}
+
+/* ── African geometric border strip ──
+   Pattern: repeating diagonal squares / Kente-inspired blocks
+   Built entirely with CSS gradients — no images required. */
+.african-border {
+    height: 10px;
+    background-image:
+        repeating-linear-gradient(
+            90deg,
+            #C9A84C 0px,   #C9A84C 14px,
+            #002b80 14px,  #002b80 28px,
+            #C9A84C 28px,  #C9A84C 42px,
+            #FFFFFF 42px,  #FFFFFF 56px,
+            #1a3a9e 56px,  #1a3a9e 70px,
+            #C9A84C 70px,  #C9A84C 84px,
+            #002b80 84px,  #002b80 98px,
+            #E8C97A 98px,  #E8C97A 112px
+        );
     width: 100%;
 }
 
-.content {
-    -premailer-cellpadding: 0;
-    -premailer-cellspacing: 0;
-    -premailer-width: 100%;
-    margin: 0;
-    padding: 0;
+.african-border-thin {
+    height: 5px;
+    background-image:
+        repeating-linear-gradient(
+            90deg,
+            #C9A84C 0px,  #C9A84C 10px,
+            #002b80 10px, #002b80 20px,
+            #E8C97A 20px, #E8C97A 30px,
+            #1a3a9e 30px, #1a3a9e 40px
+        );
     width: 100%;
 }
 
-/* Header */
+/* ── Card / inner body ── */
+.inner-body {
+    background-color: #FFFFFF;
+    border-left: 4px solid #C9A84C;
+    border-right: 4px solid #C9A84C;
+    margin: 0 auto;
+    padding: 0;
+    width: 600px;
+    -premailer-width: 600px;
+    box-shadow: 0 4px 24px rgba(0,43,128,0.10);
+}
 
+/* ── Header ── */
 .header {
-    padding: 25px 0;
-    text-align: center;
+    background-color: #002b80;
+    padding: 22px 32px;
+    text-align: left;
 }
 
 .header a {
-    color: #3d4852;
-    font-size: 19px;
-    font-weight: bold;
+    color: #E8C97A;
+    font-size: 18px;
+    font-weight: 700;
     text-decoration: none;
 }
 
-/* Logo */
-
-.logo {
-    height: 75px;
-    max-height: 75px;
-    width: 75px;
+/* ── Content cell ── */
+.content-cell {
+    padding: 28px 36px 24px 36px;
 }
 
-/* Body */
+/* ── Subcopy ── */
+.subcopy {
+    border-top: 1px solid #EDE8DE;
+    margin-top: 18px;
+    padding-top: 16px;
+}
 
-.body {
-    -premailer-cellpadding: 0;
-    -premailer-cellspacing: 0;
-    -premailer-width: 100%;
-    background-color: #ffffff;
-    border-bottom: 1px solid #edf2f7;
-    border-top: 1px solid #edf2f7;
-    margin: 0;
+.subcopy p { font-size: 13px; color: #6B7280; }
+
+/* ── Footer ── */
+.footer-wrapper {
+    background-color: #002b80;
+    width: 600px;
+    margin: 0 auto;
+}
+
+.footer {
+    margin: 0 auto;
     padding: 0;
+    text-align: center;
+    width: 600px;
+    -premailer-width: 600px;
+}
+
+.footer p { color: #8fa8d8; font-size: 12px; text-align: center; }
+.footer a { color: #E8C97A; text-decoration: none; }
+
+/* ── Button ── */
+.action a {
+    display: inline-block;
+    background-color: #C9A84C !important;
+    color: #002b80 !important;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 11px 28px;
+    border-radius: 3px;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+}
+
+/* ── Panel ── */
+.panel {
+    border-left: 3px solid #C9A84C;
+    background-color: #FAF7F0;
+    padding: 12px 16px;
+    margin: 14px 0;
+}
+
+.panel-content p { margin-bottom: 6px; }
+
+/* ── Tables ── */
+.table table {
+    margin: 20px auto;
     width: 100%;
 }
 
-.inner-body {
-    -premailer-cellpadding: 0;
-    -premailer-cellspacing: 0;
-    -premailer-width: 1090px;
-    background-color: #ffffff;
-    border-color: #e8e5ef;
-    border-radius: 2px;
-    border-width: 1px;
-    box-shadow: 0 2px 0 rgba(0, 0, 150, 0.025), 2px 4px 0 rgba(0, 0, 150, 0.015);
-    margin: 0 auto;
-    padding: 0;
-    width: 1090px;
-}
-
-/* Subcopy */
-
-.subcopy {
-    border-top: 1px solid #e8e5ef;
-    margin-top: 25px;
-    padding-top: 25px;
-}
-
-.subcopy p {
-    font-size: 14px;
-}
-
-/* Footer */
-
-.footer {
-    -premailer-cellpadding: 0;
-    -premailer-cellspacing: 0;
-    -premailer-width: 1090px;
-    margin: 0 auto;
-    padding: 0;
-    text-align: center;
-    width: 1090px;
-}
-
-.footer p {
-    color: #b0adc5;
+.table th {
+    background-color: #002b80;
+    color: #E8C97A;
     font-size: 12px;
-    text-align: center;
+    font-weight: 700;
+    padding: 8px 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
 }
 
-.footer a {
-    color: #b0adc5;
-    text-decoration: underline;
+.table td {
+    color: #1A1A2E;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #EDE8DE;
+}
+
+.table tr:last-child td { border-bottom: none; }
+
+/* ── Responsive ── */
+@media only screen and (max-width: 620px) {
+    .inner-body { width: 100% !important; }
+    .footer-wrapper { width: 100% !important; }
+    .footer { width: 100% !important; }
+    .content-cell { padding: 20px 20px 18px 20px !important; }
+    .action a { width: 100% !important; text-align: center; display: block; }
 }
 
 /* Tables */
