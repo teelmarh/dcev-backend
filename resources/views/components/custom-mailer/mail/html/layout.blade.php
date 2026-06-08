@@ -6,20 +6,14 @@
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
 <style>
-@media only screen and (max-width: 600px) {
-.inner-body {
-width: 100% !important;
+@media only screen and (max-width: 620px) {
+    .inner-body { width: 100% !important; }
+    .footer-wrapper { width: 100% !important; }
+    .footer { width: 100% !important; }
+    .content-cell { padding: 20px !important; }
 }
-
-.footer {
-width: 100% !important;
-}
-}
-
 @media only screen and (max-width: 500px) {
-.button {
-width: 100% !important;
-}
+    .action a { width: 100% !important; display: block; text-align: center; }
 }
 </style>
     <style>
@@ -29,26 +23,29 @@ width: 100% !important;
         @endphp
     </style>
 </head>
-<body>
+<body style="background-color:#F3EFE6; margin:0; padding:20px 0;">
 
-<table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
-    {{ $header ?? '' }}
-
-    <!-- Email Body -->
+<table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#F3EFE6;">
     <tr>
-        <table class="inner-body" align="center" width="1090" cellpadding="0" cellspacing="0" role="presentation">
-            <!-- Body content -->
-            <tr>
-                <td class="content-cell">
-                    {{ Illuminate\Mail\Markdown::parse($slot) }}
+        <td align="center">
+            <table align="center" width="600" cellpadding="0" cellspacing="0" role="presentation" style="width:600px; background-color:#ffffff; border-left:4px solid #C9A84C; border-right:4px solid #C9A84C; box-shadow:0 4px 24px rgba(27,67,50,0.10);">
 
-                </td>
-            </tr>
-        </table>
-    </tr>
-    <tr>
-         {{ $footer ?? '' }}
+                {{ $header ?? '' }}
+
+                <!-- Body -->
+                <tr>
+                    <td class="content-cell" style="padding:28px 36px 24px 36px;">
+                        {{ Illuminate\Mail\Markdown::parse($slot) }}
+                    </td>
+                </tr>
+
+            </table>
+
+            {{ $footer ?? '' }}
+
+        </td>
     </tr>
 </table>
+
 </body>
 </html>
