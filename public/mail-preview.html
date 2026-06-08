@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCEV Mail Preview</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #E8EDF8;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  color: #1e2a4a;
+  padding: 48px 16px;
+}
+.wrap { max-width: 600px; margin: 0 auto; }
+
+.chevron-top {
+  height: 16px;
+  background-color: #002b80;
+  background-image:
+    linear-gradient(135deg, #C9A84C 33.33%, transparent 33.33%) 0 0,
+    linear-gradient(225deg, #C9A84C 33.33%, transparent 33.33%) 0 0;
+  background-size: 16px 16px;
+  background-repeat: repeat-x;
+  background-position: 0 bottom;
+}
+.chevron-mid {
+  height: 10px;
+  background-color: #fff;
+  background-image:
+    linear-gradient(315deg, #002b80 33.33%, transparent 33.33%) 0 0,
+    linear-gradient(45deg,  #002b80 33.33%, transparent 33.33%) 0 0;
+  background-size: 10px 10px;
+  background-repeat: repeat-x;
+  background-position: 0 bottom;
+}
+.chevron-bottom {
+  height: 10px;
+  background-color: #f5f7ff;
+  background-image:
+    linear-gradient(315deg, #C9A84C 33.33%, transparent 33.33%) 0 0,
+    linear-gradient(45deg,  #C9A84C 33.33%, transparent 33.33%) 0 0;
+  background-size: 10px 10px;
+  background-repeat: repeat-x;
+  background-position: 0 bottom;
+}
+.card {
+  background: #ffffff;
+  box-shadow: 0 4px 32px rgba(0,43,128,0.10);
+}
+.header {
+  background: #002b80;
+  padding: 28px 40px;
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+  display: block;
+}
+.header-tagline {
+  font-size: 10px;
+  color: #7fa4d4;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 4px;
+}
+.header-badge {
+  font-size: 10px;
+  color: #7fa4d4;
+  letter-spacing: 0.8px;
+  text-align: right;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+.body { padding: 36px 40px 32px 40px; }
+h1 {
+  color: #002b80;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #edf0f8;
+}
+p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #374151;
+  margin-bottom: 14px;
+}
+p.greeting { color: #6b7280; font-size: 14px; margin-bottom: 10px; }
+.callout {
+  background: #f0f4ff;
+  border-left: 3px solid #002b80;
+  padding: 14px 18px;
+  border-radius: 0 4px 4px 0;
+  margin: 20px 0 24px 0;
+}
+.callout p { margin: 0; font-size: 14px; color: #1e2a4a; line-height: 1.55; }
+.btn-wrap { margin: 24px 0 20px 0; text-align: center; }
+.btn {
+  display: inline-block;
+  background: #002b80;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 40px;
+  border-radius: 4px;
+  text-decoration: none;
+  letter-spacing: 0.3px;
+}
+.subcopy {
+  border-top: 1px solid #edf0f8;
+  margin-top: 22px;
+  padding-top: 16px;
+  font-size: 12px;
+  color: #9ca3af;
+  line-height: 1.6;
+}
+.subcopy a { color: #002b80; text-decoration: underline; }
+.footer-wrap {
+  background: #f5f7ff;
+  padding: 20px 40px 22px 40px;
+  text-align: center;
+}
+.footer-links { margin-bottom: 10px; }
+.footer-links a {
+  color: #6b7280;
+  font-size: 12px;
+  text-decoration: none;
+  margin: 0 12px;
+}
+.footer-copy { font-size: 11px; color: #9ca3af; }
+.footer-copy strong { color: #4b5563; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="chevron-top"></div>
+
+  <div class="card">
+    <div class="header">
+      <div class="header-inner">
+        <div>
+          <span class="header-name">Aviora DCEV</span>
+        </div>
+        <div class="header-badge">NCAA<br>Personnel Licensing</div>
+      </div>
+    </div>
+
+    <div class="chevron-mid"></div>
+
+    <div class="body">
+      <h1>Verify Your Email Address</h1>
+      <p class="greeting">Hi Adaeze,</p>
+      <p>Thank you for registering on the DCEV platform. To complete your account setup and begin your licence application, please verify your email address.</p>
+
+      <div class="callout">
+        <p>Your one-time verification code is valid for <strong>10 minutes</strong>. Do not share it with anyone.</p>
+      </div>
+
+      <div class="btn-wrap">
+        <a href="#" class="btn">Verify Email Address</a>
+      </div>
+
+      <p>If you did not create an account with us, you can safely ignore this email.</p>
+
+      <div class="subcopy">
+        If the button above doesn't work, copy and paste this link into your browser:<br>
+        <a href="#">https://myadcapp.live/verify-email?token=abc123</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="chevron-bottom"></div>
+
+  <div class="footer-wrap">
+    <div class="footer-links">
+      <a href="#">Unsubscribe</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Help Center</a>
+    </div>
+    <div class="footer-copy">
+      &copy; 2026 <strong>Aviora DCEV</strong>. All rights reserved.
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
