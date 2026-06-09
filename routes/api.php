@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\Licences\Amel\AmelAmeController;
 use App\Http\Controllers\Api\V1\Licences\DeliveryDetailController;
 use App\Http\Controllers\Api\V1\Transactions\TransactionController;
 use App\Http\Controllers\Api\V1\Transactions\WebhookController;
+use App\Http\Controllers\Api\V1\Appointments\AppointmentController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -72,6 +73,17 @@ Route::prefix('v1')->group(function () {
             Route::post('/ans/aso', [AnsAsoController::class, 'store']);
 
             Route::post('/amel/ame', [AmelAmeController::class, 'store']);
+        });
+
+        // Appointments
+        Route::prefix('appointments')->group(function () {
+            Route::get('/offices',                              [AppointmentController::class, 'offices']);
+            Route::get('/availability/{office}/{date}',        [AppointmentController::class, 'availability']);
+            Route::get('/',                                     [AppointmentController::class, 'index']);
+            Route::post('/',                                    [AppointmentController::class, 'store']);
+            Route::get('/{appointment}',                        [AppointmentController::class, 'show']);
+            Route::patch('/{appointment}/reschedule',           [AppointmentController::class, 'reschedule']);
+            Route::patch('/{appointment}/cancel',               [AppointmentController::class, 'cancel']);
         });
     });
 });
