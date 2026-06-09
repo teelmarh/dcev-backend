@@ -40,9 +40,7 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('/nin/verify', NinVerificationController::class)->only('store');
-
         Route::apiResource('/profile', ProfileController::class)->only(['index', 'store']);
-
         Route::post('/empic/human', [EmpicHumanController::class, 'store']);
         Route::post('/empic/address', [EmpicAddressController::class, 'store']);
 
@@ -56,30 +54,24 @@ Route::prefix('v1')->group(function () {
         Route::prefix('licences')->group(function () {
             Route::get('/', [LicenceController::class, 'index']);
             Route::get('/{licence}', [LicenceController::class, 'show']);
-
             Route::post('/{licence}/delivery',  [DeliveryDetailController::class, 'store']);
             Route::get('/{licence}/delivery',   [DeliveryDetailController::class, 'show']);
-
             Route::post('/fcl/pilot', [FclPilotController::class, 'store']);
             Route::post('/fcl/cabin-crew', [FclCabinCrewController::class, 'store']);
             Route::post('/fcl/dispatch', [FclFlightDispatchController::class, 'store']);
-
             Route::post('/ans/atc', [AnsAtcController::class, 'store']);
             Route::post('/ans/atsep', [AnsAtsepController::class, 'store']);
             Route::post('/ans/aso', [AnsAsoController::class, 'store']);
-
             Route::post('/amel/ame', [AmelAmeController::class, 'store']);
         });
 
-        // Appointments
+        Route::apiResource('appointments', AppointmentController::class)->only(['index', 'store', 'show']);
+
         Route::prefix('appointments')->group(function () {
-            Route::get('/offices',                        [AppointmentController::class, 'offices']);
-            Route::get('/availability/{office}/{date}',  [AppointmentController::class, 'availability']);
-            Route::get('/',                               [AppointmentController::class, 'index']);
-            Route::post('/',                              [AppointmentController::class, 'store']);
-            Route::get('/{appointment}',                  [AppointmentController::class, 'show']);
-            Route::patch('/{appointment}/reschedule',     [AppointmentController::class, 'reschedule']);
-            Route::patch('/{appointment}/cancel',         [AppointmentController::class, 'cancel']);
+            Route::get('offices', [AppointmentController::class, 'offices']);
+            Route::get('availability/{office}/{date}', [AppointmentController::class, 'availability']);
+            Route::patch('{appointment}/reschedule', [AppointmentController::class, 'reschedule']);
+            Route::patch('{appointment}/cancel', [AppointmentController::class, 'cancel']);
         });
     });
 });

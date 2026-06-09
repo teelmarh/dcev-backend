@@ -72,7 +72,7 @@ class AppointmentController extends Controller
     public function show(Request $request, Appointment $appointment): JsonResponse
     {
         if ($appointment->user_id !== $request->user()->id) {
-            return $this->dataResponse(null, 'Forbidden.', false, 403);
+            return $this->errorResponse('Forbidden.', 403);
         }
 
         return $this->dataResponse(
@@ -93,7 +93,7 @@ class AppointmentController extends Controller
         $office    = RegionalOffice::findOrFail($validated['regional_office_id']);
 
         if ($licence->user_id !== $request->user()->id) {
-            return $this->dataResponse(null, 'Forbidden.', false, 403);
+            return $this->errorResponse('Forbidden.', 403);
         }
 
         // Prevent duplicate active appointment for the same licence
@@ -113,7 +113,7 @@ class AppointmentController extends Controller
         try {
             $this->appointmentService->validateDate($office, $licence, $validated['scheduled_date']);
         } catch (\InvalidArgumentException $e) {
-            return $this->dataResponse(null, $e->getMessage(), false, 422);
+            return $this->errorResponse($e->getMessage(), 422);
         }
 
         $appointment = Appointment::create([
@@ -139,11 +139,11 @@ class AppointmentController extends Controller
     public function reschedule(RescheduleAppointmentRequest $request, Appointment $appointment): JsonResponse
     {
         if ($appointment->user_id !== $request->user()->id) {
-            return $this->dataResponse(null, 'Forbidden.', false, 403);
+            return $this->errorResponse('Forbidden.', 403);
         }
 
         if (! $appointment->isReschedulable()) {
-            return $this->dataResponse(null, 'This appointment cannot be rescheduled.', false, 422);
+            return $this->errorResponse('This appointment cannot be rescheduled.', 422);
         }
 
         $validated = $request->validated();
@@ -156,7 +156,7 @@ class AppointmentController extends Controller
         try {
             $this->appointmentService->validateDate($office, $licence, $validated['scheduled_date']);
         } catch (\InvalidArgumentException $e) {
-            return $this->dataResponse(null, $e->getMessage(), false, 422);
+            return $this->errorResponse($e->getMessage(), 422);
         }
 
         $appointment->update([
@@ -181,11 +181,11 @@ class AppointmentController extends Controller
     public function cancel(Request $request, Appointment $appointment): JsonResponse
     {
         if ($appointment->user_id !== $request->user()->id) {
-            return $this->dataResponse(null, 'Forbidden.', false, 403);
+            return $this->errorResponse('Forbidden.', 403);
         }
 
         if (! $appointment->isCancellable()) {
-            return $this->dataResponse(null, 'This appointment cannot be cancelled.', false, 422);
+            return $this->errorResponse('This appointment cannot be cancelled.', 422);
         }
 
         $appointment->update(['status' => 'cancelled']);

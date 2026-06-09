@@ -63,11 +63,11 @@ class TransactionController extends Controller
 
         // Ownership check
         if ($licence->user_id !== $request->user()->id) {
-            return $this->dataResponse(null, 'Forbidden.', false, 403);
+            return $this->errorResponse('Forbidden.', 403);
         }
 
         if ($licence->delivery_method !== 'delivery') {
-            return $this->dataResponse(null, 'This licence does not require a delivery payment.', false, 422);
+            return $this->errorResponse('This licence does not require a delivery payment.', 422);
         }
 
         $transaction = $this->paymentService->initiateDelivery(

@@ -20,11 +20,11 @@ class DeliveryDetailController extends Controller
     public function store(StoreDeliveryDetailRequest $request, Licence $licence): JsonResponse
     {
         if ($licence->user_id !== $request->user()->id) {
-            return $this->dataResponse(null, 'Forbidden.', false, 403);
+            return $this->errorResponse('Forbidden.', 403);
         }
 
         if ($licence->delivery_method !== 'delivery') {
-            return $this->dataResponse(null, 'This licence is set for pickup, not delivery.', false, 422);
+            return $this->errorResponse('This licence is set for pickup, not delivery.', 422);
         }
 
         $detail = $licence->deliveryDetail()->updateOrCreate(
@@ -46,13 +46,13 @@ class DeliveryDetailController extends Controller
     public function show(Licence $licence): JsonResponse
     {
         if ($licence->user_id !== request()->user()->id) {
-            return $this->dataResponse(null, 'Forbidden.', false, 403);
+            return $this->errorResponse('Forbidden.', 403);
         }
 
         $detail = $licence->deliveryDetail;
 
         if (! $detail) {
-            return $this->dataResponse(null, 'No delivery details found.', false, 404);
+            return $this->errorResponse('No delivery details found.', 404);
         }
 
         return $this->dataResponse(new DeliveryDetailResource($detail), 'Delivery details retrieved.', true, 200);
