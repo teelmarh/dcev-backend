@@ -35,4 +35,21 @@ return [
         ],
     ],
 
+    'paystack' => [
+        'secret_key'   => env('PAYSTACK_SECRET_KEY'),
+        'public_key'   => env('PAYSTACK_PUBLIC_KEY'),
+    ],
+
+    'remita' => [
+        'merchant_id'    => env('REMITA_MERCHANT_ID'),
+        'service_type_id'=> env('REMITA_SERVICE_TYPE_ID'),
+        'api_key'        => env('REMITA_API_KEY'),
+        'sandbox'        => (bool) env('REMITA_SANDBOX', true),
+    ],
+
+    'dcev' => [
+        'enrollment_fee' => (int) env('DCEV_ENROLLMENT_FEE', 15000),
+        'delivery_fee'   => (int) env('DCEV_DELIVERY_FEE', 5000),
+    ],
+
 ];

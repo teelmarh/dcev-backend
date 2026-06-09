@@ -19,11 +19,17 @@ use App\Http\Controllers\Api\V1\Licences\Ans\AnsAtcController;
 use App\Http\Controllers\Api\V1\Licences\Ans\AnsAtsepController;
 use App\Http\Controllers\Api\V1\Licences\Ans\AnsAsoController;
 use App\Http\Controllers\Api\V1\Licences\Amel\AmelAmeController;
+use App\Http\Controllers\Api\V1\Transactions\TransactionController;
+use App\Http\Controllers\Api\V1\Transactions\WebhookController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('v1')->group(function () {
     Route::apiResource('/health', HealthController::class)->only('index');
+
+    // Webhooks — no auth, signature-validated inside handler
+    Route::post('/webhooks/{gateway}', [WebhookController::class, 'handle'])
+        ->where('gateway', 'remita|paystack');
 
     Route::apiResource('/register', RegisterController::class)->only('store');
     Route::apiResource('/login', LoginController::class)->only('store');
@@ -39,6 +45,14 @@ Route::prefix('v1')->group(function () {
 
         Route::post('/empic/human', [EmpicHumanController::class, 'store']);
         Route::post('/empic/address', [EmpicAddressController::class, 'store']);
+
+        // Transactions
+        Route::prefix('transactions')->group(function () {
+            Route::post('/enrollment/initiate', [TransactionController::class, 'initiateEnrollment']);
+            Route::post('/enrollment/verify',   [TransactionController::class, 'verifyEnrollment']);
+            Route::post('/delivery/initiate',   [TransactionController::class, 'initiateDelivery']);
+            Route::post('/delivery/verify',     [TransactionController::class, 'verifyDelivery']);
+        });
 
         Route::prefix('licences')->group(function () {
             Route::get('/', [LicenceController::class, 'index']);
