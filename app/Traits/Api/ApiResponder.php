@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\Cache;
 
 trait ApiResponder
 {
-    public function successResponse($data, $code)
+    public function successResponse($data, $message, $code)
     {
-        return response()->json($data, $code);
+        return response()->json([
+            'data' => $data,
+            'message' => $message,
+            'success' => true,
+        ], $code);
     }
 
     public function dataResponseWithoutMessage($data, $success, $code)
