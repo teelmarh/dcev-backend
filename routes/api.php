@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\Licences\Ans\AnsAtcController;
 use App\Http\Controllers\Api\V1\Licences\Ans\AnsAtsepController;
 use App\Http\Controllers\Api\V1\Licences\Ans\AnsAsoController;
 use App\Http\Controllers\Api\V1\Licences\Amel\AmelAmeController;
+use App\Http\Controllers\Api\V1\Licences\DeliveryDetailController;
 use App\Http\Controllers\Api\V1\Transactions\TransactionController;
 use App\Http\Controllers\Api\V1\Transactions\WebhookController;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +58,10 @@ Route::prefix('v1')->group(function () {
         Route::prefix('licences')->group(function () {
             Route::get('/', [LicenceController::class, 'index']);
             Route::get('/{licence}', [LicenceController::class, 'show']);
+
+            // Delivery details
+            Route::post('/{licence}/delivery',  [DeliveryDetailController::class, 'store']);
+            Route::get('/{licence}/delivery',   [DeliveryDetailController::class, 'show']);
 
             Route::post('/fcl/pilot', [FclPilotController::class, 'store']);
             Route::post('/fcl/cabin-crew', [FclCabinCrewController::class, 'store']);

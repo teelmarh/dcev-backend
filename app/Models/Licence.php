@@ -12,6 +12,7 @@ use App\Models\LicencePilotDetail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Licence extends Model
 {
@@ -71,6 +72,21 @@ class Licence extends Model
     public function ameDetail(): HasOne
     {
         return $this->hasOne(LicenceAmeDetail::class);
+    }
+
+    public function deliveryDetail(): HasOne
+    {
+        return $this->hasOne(LicenceDeliveryDetail::class);
+    }
+
+    public function enrollmentTransaction(): BelongsTo
+    {
+        return $this->belongsTo(Transaction::class, 'enrollment_transaction_id');
+    }
+
+    public function transactions(): MorphMany
+    {
+        return $this->morphMany(Transaction::class, 'transactable');
     }
 
     /**
