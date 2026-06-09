@@ -47,8 +47,6 @@ class Transaction extends Model
         });
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
     public function isPaid(): bool
     {
         return $this->status === 'paid';

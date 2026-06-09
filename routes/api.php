@@ -29,9 +29,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::apiResource('/health', HealthController::class)->only('index');
 
-    // Webhooks — no auth, signature-validated inside handler
-    Route::post('/webhooks/{gateway}', [WebhookController::class, 'handle'])
-        ->where('gateway', 'remita|paystack');
+    Route::post('/webhooks/{gateway}', [WebhookController::class, 'handle'])->where('gateway', 'remita|paystack');
 
     Route::apiResource('/register', RegisterController::class)->only('store');
     Route::apiResource('/login', LoginController::class)->only('store');
@@ -48,7 +46,6 @@ Route::prefix('v1')->group(function () {
         Route::post('/empic/human', [EmpicHumanController::class, 'store']);
         Route::post('/empic/address', [EmpicAddressController::class, 'store']);
 
-        // Transactions
         Route::prefix('transactions')->group(function () {
             Route::post('/enrollment/initiate', [TransactionController::class, 'initiateEnrollment']);
             Route::post('/enrollment/verify',   [TransactionController::class, 'verifyEnrollment']);
@@ -60,7 +57,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [LicenceController::class, 'index']);
             Route::get('/{licence}', [LicenceController::class, 'show']);
 
-            // Delivery details
             Route::post('/{licence}/delivery',  [DeliveryDetailController::class, 'store']);
             Route::get('/{licence}/delivery',   [DeliveryDetailController::class, 'show']);
 
@@ -77,13 +73,13 @@ Route::prefix('v1')->group(function () {
 
         // Appointments
         Route::prefix('appointments')->group(function () {
-            Route::get('/offices',                              [AppointmentController::class, 'offices']);
-            Route::get('/availability/{office}/{date}',        [AppointmentController::class, 'availability']);
-            Route::get('/',                                     [AppointmentController::class, 'index']);
-            Route::post('/',                                    [AppointmentController::class, 'store']);
-            Route::get('/{appointment}',                        [AppointmentController::class, 'show']);
-            Route::patch('/{appointment}/reschedule',           [AppointmentController::class, 'reschedule']);
-            Route::patch('/{appointment}/cancel',               [AppointmentController::class, 'cancel']);
+            Route::get('/offices',                        [AppointmentController::class, 'offices']);
+            Route::get('/availability/{office}/{date}',  [AppointmentController::class, 'availability']);
+            Route::get('/',                               [AppointmentController::class, 'index']);
+            Route::post('/',                              [AppointmentController::class, 'store']);
+            Route::get('/{appointment}',                  [AppointmentController::class, 'show']);
+            Route::patch('/{appointment}/reschedule',     [AppointmentController::class, 'reschedule']);
+            Route::patch('/{appointment}/cancel',         [AppointmentController::class, 'cancel']);
         });
     });
 });

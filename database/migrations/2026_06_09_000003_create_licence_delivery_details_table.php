@@ -11,16 +11,11 @@ return new class extends Migration
         Schema::create('licence_delivery_details', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('licence_id')
-                ->unique()
-                ->constrained('licences')
-                ->cascadeOnDelete();
+            $table->foreignId('licence_id')->unique()->constrained('licences')->cascadeOnDelete();
 
-            // Recipient details (may differ from applicant)
             $table->string('recipient_name');
             $table->string('recipient_phone', 20);
 
-            // Delivery address
             $table->string('address_line');
             $table->string('city');
             $table->string('state');
@@ -29,11 +24,7 @@ return new class extends Migration
 
             $table->text('courier_instructions')->nullable();
 
-            // Filled after delivery payment is confirmed
-            $table->foreignId('delivery_transaction_id')
-                ->nullable()
-                ->constrained('transactions')
-                ->nullOnDelete();
+            $table->foreignId('delivery_transaction_id')->nullable()->constrained('transactions')->nullOnDelete();
 
             $table->timestamps();
         });

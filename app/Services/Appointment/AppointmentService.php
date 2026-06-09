@@ -41,6 +41,10 @@ class AppointmentService
             throw new \InvalidArgumentException('Appointments cannot be booked on Sundays.');
         }
 
+        if ($requested->isWeekend()) {
+            throw new \InvalidArgumentException('Appointments cannot be booked on weekends.');
+        }
+
         if (! $office->hasCapacityForDate($date)) {
             throw new \InvalidArgumentException(
                 "No capacity available at {$office->name} on {$requested->toDateString()}. Please choose another date."

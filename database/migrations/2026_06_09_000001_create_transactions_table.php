@@ -17,21 +17,12 @@ return new class extends Migration
             $table->enum('type', ['enrollment', 'delivery']);
             $table->decimal('amount', 10, 2);
             $table->string('currency', 5)->default('NGN');
-
-            // Internal reference e.g. DCEV-ENR-XXXXXXXX
             $table->string('reference')->unique();
-
-            // What the gateway returns on initiation
             $table->string('gateway_reference')->nullable();
-
             $table->enum('status', ['pending', 'paid', 'failed', 'refunded'])->default('pending');
             $table->enum('gateway', ['remita', 'paystack']);
-
-            // Raw gateway response snapshot
             $table->json('metadata')->nullable();
-
             $table->timestamp('paid_at')->nullable();
-
             $table->timestamps();
         });
     }

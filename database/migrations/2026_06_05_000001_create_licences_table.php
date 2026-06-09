@@ -46,9 +46,16 @@ return new class extends Migration
             $table->string('id_form')->nullable();
             $table->string('id_number')->nullable();
 
-            // Uploaded documents,;/
+            // Uploaded documents
             $table->string('licence_document_path')->nullable();
             $table->string('passport_photo_path')->nullable();
+
+            // Payment & delivery — added inline (no separate alter migration)
+            $table->foreignId('enrollment_transaction_id')
+                ->nullable()
+                ->constrained('transactions')
+                ->nullOnDelete();
+            $table->enum('delivery_method', ['pickup', 'delivery'])->nullable();
 
             $table->timestamps();
         });
