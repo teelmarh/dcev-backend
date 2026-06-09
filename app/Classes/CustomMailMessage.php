@@ -8,7 +8,7 @@ class CustomMailMessage extends MailMessage
 {
     public $theme = 'custom-mailer';
 
-    public function __construct(pripate CustomMailerManager $customMailerManager)
+    public function __construct(private CustomMailerManager $customMailerManager)
     {
         $this->viewData = ['cmm' => $this->customMailerManager];
         // $this->markdown('components.custom-mailer.notifications.email', ['cmm' => $this->customMailerManager]);
