@@ -17,11 +17,11 @@ return new class extends Migration
 
             $table->foreignId('licence_id')
                 ->constrained('licences')
-                ->cascadeOnDelete();
+                ->noActionOnDelete();
 
             $table->foreignId('regional_office_id')
                 ->constrained('regional_offices')
-                ->restrictOnDelete();
+                ->noActionOnDelete();
 
             $table->date('scheduled_date');
 

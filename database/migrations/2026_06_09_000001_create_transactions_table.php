@@ -25,10 +25,22 @@ return new class extends Migration
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
         });
+
+        // licences.enrollment_transaction_id FK — added here because transactions runs after licences
+        Schema::table('licences', function (Blueprint $table) {
+            $table->foreign('enrollment_transaction_id')
+                ->references('id')
+                ->on('transactions')
+                ->nullOnDelete();
+        });
     }
 
     public function down(): void
     {
+        Schema::table('licences', function (Blueprint $table) {
+            $table->dropForeign(['enrollment_transaction_id']);
+        });
+
         Schema::dropIfExists('transactions');
     }
 };

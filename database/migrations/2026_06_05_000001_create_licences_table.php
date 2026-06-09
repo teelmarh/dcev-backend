@@ -50,8 +50,8 @@ return new class extends Migration
             $table->string('licence_document_path')->nullable();
             $table->string('passport_photo_path')->nullable();
 
-            // Payment & delivery — added inline (no separate alter migration)
-            $table->foreignId('enrollment_transaction_id')->nullable()->constrained('transactions')->nullOnDelete();
+            // Payment & delivery — FK added in transactions migration (ordering constraint)
+            $table->unsignedBigInteger('enrollment_transaction_id')->nullable();
             $table->enum('delivery_method', ['pickup', 'delivery'])->nullable();
 
             $table->timestamps();

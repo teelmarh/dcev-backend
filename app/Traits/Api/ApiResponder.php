@@ -9,13 +9,15 @@ use Illuminate\Support\Facades\Cache;
 
 trait ApiResponder
 {
-    public function successResponse($data, $message, $code)
+    public function successResponse($data, $code, ?string $message = null)
     {
-        return response()->json([
-            'data' => $data,
-            'message' => $message,
-            'success' => true,
-        ], $code);
+        $payload = ['data' => $data, 'success' => true];
+
+        if ($message !== null) {
+            $payload['message'] = $message;
+        }
+
+        return response()->json($payload, $code);
     }
 
     public function dataResponseWithoutMessage($data, $success, $code)
@@ -78,15 +80,12 @@ trait ApiResponder
 
         $instance = $this->transformData($instance, $transformer);
 
-        return $this->successResponse([
-            'message' => $message,
-            'data' => $instance,
-        ], $code);
+        return $this->successResponse($instance, $code, $message);
     }
 
     protected function showMessage($message, $code = 200)
     {
-        return $this->successResponse(['data' => ['message' => $message, 'success' => true]], $code);
+        return $this->successResponse(null, $code, $message);
     }
     protected function paginate(Collection $collection)
     {
