@@ -53,9 +53,10 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('licences')->group(function () {
             Route::get('/', [LicenceController::class, 'index']);
-            Route::get('/{licence}', [LicenceController::class, 'show']);
-            Route::post('/{licence}/delivery',  [DeliveryDetailController::class, 'store']);
-            Route::get('/{licence}/delivery',   [DeliveryDetailController::class, 'show']);
+
+            Route::post('/delivery', [DeliveryDetailController::class, 'store']);
+            Route::get('/delivery',  [DeliveryDetailController::class, 'show']);
+
             Route::post('/fcl/pilot', [FclPilotController::class, 'store']);
             Route::post('/fcl/cabin-crew', [FclCabinCrewController::class, 'store']);
             Route::post('/fcl/dispatch', [FclFlightDispatchController::class, 'store']);
@@ -63,6 +64,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/ans/atsep', [AnsAtsepController::class, 'store']);
             Route::post('/ans/aso', [AnsAsoController::class, 'store']);
             Route::post('/amel/ame', [AmelAmeController::class, 'store']);
+
+            Route::get('/{licence}', [LicenceController::class, 'show']);
         });
 
         Route::apiResource('appointments', AppointmentController::class)->only(['index', 'store', 'show']);

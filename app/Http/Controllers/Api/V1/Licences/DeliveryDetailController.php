@@ -8,17 +8,19 @@ use App\Http\Resources\Licences\DeliveryDetailResource;
 use App\Models\Licence;
 use App\Traits\Api\ApiResponder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DeliveryDetailController extends Controller
 {
     use ApiResponder;
 
     /**
-     * POST /v1/licences/{licence}/delivery
-     * Store or update delivery details for a licence.
+     * POST /v1/licences/delivery
      */
-    public function store(StoreDeliveryDetailRequest $request, Licence $licence): JsonResponse
+    public function store(StoreDeliveryDetailRequest $request): JsonResponse
     {
+        $licence = Licence::findOrFail($request->validated('licence_id'));
+
         if ($licence->user_id !== $request->user()->id) {
             return $this->errorResponse('Forbidden.', 403);
         }
@@ -41,11 +43,13 @@ class DeliveryDetailController extends Controller
     }
 
     /**
-     * GET /v1/licences/{licence}/delivery
+     * GET /v1/licences/delivery
      */
-    public function show(Licence $licence): JsonResponse
+    public function show(Request $request): JsonResponse
     {
-        if ($licence->user_id !== request()->user()->id) {
+        $licence = Licence::findOrFail($request->integer('licence_id'));
+
+        if ($licence->user_id !== $request->user()->id) {
             return $this->errorResponse('Forbidden.', 403);
         }
 

@@ -73,6 +73,9 @@ abstract class StoreLicenceRequest extends FormRequest
             // Uploaded documents
             'licence_document' => 'nullable|file|mimes:pdf|max:10240',     // max 10 MB
             'passport_photo'   => 'nullable|file|mimes:jpeg,jpg,png|max:5120', // max 5 MB
+
+            // Delivery preference
+            'delivery_method'  => 'required|in:pickup,delivery',
         ];
     }
 
@@ -89,7 +92,7 @@ abstract class StoreLicenceRequest extends FormRequest
             'has_prior_licence', 'prior_licence_suspended', 'prior_licence_suspended_date',
             'prior_licence_type', 'prior_licence_number', 'prior_licence_issued_date',
             'medical_cert_held', 'medical_cert_class', 'medical_cert_date', 'medical_examiner_name',
-            'id_form', 'id_number',
+            'id_form', 'id_number', 'delivery_method',
         ]);
 
         $user = $this->user();
