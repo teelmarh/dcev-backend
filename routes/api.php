@@ -51,29 +51,26 @@ Route::prefix('v1')->group(function () {
             Route::post('/delivery/verify',     [TransactionController::class, 'verifyDelivery']);
         });
 
-        Route::prefix('licences')->group(function () {
-            Route::get('/', [LicenceController::class, 'index']);
+        Route::apiResource('licences', LicenceController::class)->only(['index', 'show']);
 
+        Route::prefix('licences')->group(function () {
             Route::post('/delivery', [DeliveryDetailController::class, 'store']);
             Route::get('/delivery',  [DeliveryDetailController::class, 'show']);
 
-            Route::post('/fcl/pilot', [FclPilotController::class, 'store']);
+            Route::post('/fcl/pilot',      [FclPilotController::class, 'store']);
             Route::post('/fcl/cabin-crew', [FclCabinCrewController::class, 'store']);
-            Route::post('/fcl/dispatch', [FclFlightDispatchController::class, 'store']);
-            Route::post('/ans/atc', [AnsAtcController::class, 'store']);
-            Route::post('/ans/atsep', [AnsAtsepController::class, 'store']);
-            Route::post('/ans/aso', [AnsAsoController::class, 'store']);
-            Route::post('/amel/ame', [AmelAmeController::class, 'store']);
-
-            Route::get('/{id}', [LicenceController::class, 'show']);
+            Route::post('/fcl/dispatch',   [FclFlightDispatchController::class, 'store']);
+            Route::post('/ans/atc',        [AnsAtcController::class, 'store']);
+            Route::post('/ans/atsep',      [AnsAtsepController::class, 'store']);
+            Route::post('/ans/aso',        [AnsAsoController::class, 'store']);
+            Route::post('/amel/ame',       [AmelAmeController::class, 'store']);
         });
 
+        Route::apiResource('appointments', AppointmentController::class)->only(['index', 'store', 'show']);
+
         Route::prefix('appointments')->group(function () {
-            Route::get('/', [AppointmentController::class, 'index']);
-            Route::post('/', [AppointmentController::class, 'store']);
             Route::get('/offices', [AppointmentController::class, 'offices']);
             Route::get('/availability/{office}/{date}', [AppointmentController::class, 'availability']);
-            Route::get('/{id}', [AppointmentController::class, 'show']);
             Route::patch('/reschedule', [AppointmentController::class, 'reschedule']);
             Route::patch('/cancel', [AppointmentController::class, 'cancel']);
         });
