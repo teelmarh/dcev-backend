@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Licences;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Licences\ShowLicenceRequest;
 use App\Http\Resources\Licences\LicenceResource;
 use App\Models\Licence;
 use Illuminate\Http\JsonResponse;
@@ -36,9 +37,9 @@ class LicenceController extends Controller
     /**
      * Return a single licence. Restricted to the owner.
      */
-    public function show(Request $request, int $id): JsonResponse
+    public function show(ShowLicenceRequest $request): JsonResponse
     {
-        $licence = Licence::find($id);
+        $licence = Licence::find($request->validated('licence_id'));
 
         if (! $licence) {
             return $this->errorResponse('Licence not found.', 404);

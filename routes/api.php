@@ -51,9 +51,10 @@ Route::prefix('v1')->group(function () {
             Route::post('/delivery/verify',     [TransactionController::class, 'verifyDelivery']);
         });
 
-        Route::apiResource('licences', LicenceController::class)->only(['index', 'show']);
+        Route::apiResource('licences', LicenceController::class)->only(['index']);
 
         Route::prefix('licences')->group(function () {
+            Route::get('/show',      [LicenceController::class, 'show']);
             Route::post('/delivery', [DeliveryDetailController::class, 'store']);
             Route::get('/delivery',  [DeliveryDetailController::class, 'show']);
 
@@ -66,13 +67,14 @@ Route::prefix('v1')->group(function () {
             Route::post('/amel/ame',       [AmelAmeController::class, 'store']);
         });
 
-        Route::apiResource('appointments', AppointmentController::class)->only(['index', 'store', 'show']);
+        Route::apiResource('appointments', AppointmentController::class)->only(['index', 'store']);
 
         Route::prefix('appointments')->group(function () {
+            Route::get('/show',    [AppointmentController::class, 'show']);
             Route::get('/offices', [AppointmentController::class, 'offices']);
             Route::get('/availability/{office}/{date}', [AppointmentController::class, 'availability']);
             Route::patch('/reschedule', [AppointmentController::class, 'reschedule']);
-            Route::patch('/cancel', [AppointmentController::class, 'cancel']);
+            Route::patch('/cancel',     [AppointmentController::class, 'cancel']);
         });
     });
 });

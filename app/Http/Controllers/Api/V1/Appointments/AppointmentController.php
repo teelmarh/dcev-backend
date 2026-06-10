@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Appointments;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Appointments\RescheduleAppointmentRequest;
+use App\Http\Requests\Appointments\ShowAppointmentRequest;
 use App\Http\Requests\Appointments\StoreAppointmentRequest;
 use App\Http\Resources\Appointments\AppointmentResource;
 use App\Http\Resources\Appointments\RegionalOfficeResource;
@@ -69,9 +70,9 @@ class AppointmentController extends Controller
     /**
      * GET /v1/appointments/{appointment}
      */
-    public function show(Request $request, int $id): JsonResponse
+    public function show(ShowAppointmentRequest $request): JsonResponse
     {
-        $appointment = Appointment::find($id);
+        $appointment = Appointment::find($request->validated('appointment_id'));
 
         if (! $appointment) {
             return $this->errorResponse('Appointment not found.', 404);
