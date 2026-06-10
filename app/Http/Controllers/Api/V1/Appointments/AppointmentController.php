@@ -134,10 +134,16 @@ class AppointmentController extends Controller
     }
 
     /**
-     * PATCH /v1/appointments/{appointment}/reschedule
+     * PATCH /v1/appointments/reschedule
      */
-    public function reschedule(RescheduleAppointmentRequest $request, Appointment $appointment): JsonResponse
+    public function reschedule(RescheduleAppointmentRequest $request): JsonResponse
     {
+        $appointment = Appointment::find($request->validated('appointment_id'));
+
+        if (! $appointment) {
+            return $this->errorResponse('Appointment not found.', 404);
+        }
+
         if ($appointment->user_id !== $request->user()->id) {
             return $this->errorResponse('Forbidden.', 403);
         }
@@ -176,10 +182,16 @@ class AppointmentController extends Controller
     }
 
     /**
-     * PATCH /v1/appointments/{appointment}/cancel
+     * PATCH /v1/appointments/cancel
      */
-    public function cancel(Request $request, Appointment $appointment): JsonResponse
+    public function cancel(Request $request): JsonResponse
     {
+        $appointment = Appointment::find($request->integer('appointment_id'));
+
+        if (! $appointment) {
+            return $this->errorResponse('Appointment not found.', 404);
+        }
+
         if ($appointment->user_id !== $request->user()->id) {
             return $this->errorResponse('Forbidden.', 403);
         }

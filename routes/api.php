@@ -65,7 +65,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/ans/aso', [AnsAsoController::class, 'store']);
             Route::post('/amel/ame', [AmelAmeController::class, 'store']);
 
-            Route::get('/{licence}', [LicenceController::class, 'show']);
+            Route::get('/{licence}', [LicenceController::class, 'show'])->whereNumber('licence');
         });
 
         Route::apiResource('appointments', AppointmentController::class)->only(['index', 'store', 'show']);
@@ -73,8 +73,8 @@ Route::prefix('v1')->group(function () {
         Route::prefix('appointments')->group(function () {
             Route::get('offices', [AppointmentController::class, 'offices']);
             Route::get('availability/{office}/{date}', [AppointmentController::class, 'availability']);
-            Route::patch('{appointment}/reschedule', [AppointmentController::class, 'reschedule']);
-            Route::patch('{appointment}/cancel', [AppointmentController::class, 'cancel']);
+            Route::patch('reschedule', [AppointmentController::class, 'reschedule']);
+            Route::patch('cancel', [AppointmentController::class, 'cancel']);
         });
     });
 });

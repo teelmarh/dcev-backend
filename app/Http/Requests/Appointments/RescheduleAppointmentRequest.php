@@ -14,6 +14,7 @@ class RescheduleAppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'appointment_id'     => ['required', 'integer', 'exists:appointments,id'],
             'scheduled_date'     => ['required', 'date', 'date_format:Y-m-d', 'after:today'],
             'regional_office_id' => ['nullable', 'integer', 'exists:regional_offices,id'],
             'notes'              => ['nullable', 'string', 'max:1000'],
