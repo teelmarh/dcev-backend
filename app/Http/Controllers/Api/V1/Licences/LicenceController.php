@@ -36,8 +36,14 @@ class LicenceController extends Controller
     /**
      * Return a single licence. Restricted to the owner.
      */
-    public function show(Request $request, Licence $licence): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
+        $licence = Licence::find($id);
+
+        if (! $licence) {
+            return $this->errorResponse('Licence not found.', 404);
+        }
+
         if ($licence->user_id !== $request->user()->id) {
             return $this->errorResponse('This licence does not belong to your account.', 403);
         }

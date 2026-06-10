@@ -69,8 +69,14 @@ class AppointmentController extends Controller
     /**
      * GET /v1/appointments/{appointment}
      */
-    public function show(Request $request, Appointment $appointment): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
+        $appointment = Appointment::find($id);
+
+        if (! $appointment) {
+            return $this->errorResponse('Appointment not found.', 404);
+        }
+
         if ($appointment->user_id !== $request->user()->id) {
             return $this->errorResponse('Forbidden.', 403);
         }

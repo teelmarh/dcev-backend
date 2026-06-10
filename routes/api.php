@@ -65,16 +65,17 @@ Route::prefix('v1')->group(function () {
             Route::post('/ans/aso', [AnsAsoController::class, 'store']);
             Route::post('/amel/ame', [AmelAmeController::class, 'store']);
 
-            Route::get('/{licence}', [LicenceController::class, 'show'])->whereNumber('licence');
+            Route::get('/{id}', [LicenceController::class, 'show']);
         });
 
-        Route::apiResource('appointments', AppointmentController::class)->only(['index', 'store', 'show']);
-
         Route::prefix('appointments')->group(function () {
-            Route::get('offices', [AppointmentController::class, 'offices']);
-            Route::get('availability/{office}/{date}', [AppointmentController::class, 'availability']);
-            Route::patch('reschedule', [AppointmentController::class, 'reschedule']);
-            Route::patch('cancel', [AppointmentController::class, 'cancel']);
+            Route::get('/', [AppointmentController::class, 'index']);
+            Route::post('/', [AppointmentController::class, 'store']);
+            Route::get('/offices', [AppointmentController::class, 'offices']);
+            Route::get('/availability/{office}/{date}', [AppointmentController::class, 'availability']);
+            Route::get('/{id}', [AppointmentController::class, 'show']);
+            Route::patch('/reschedule', [AppointmentController::class, 'reschedule']);
+            Route::patch('/cancel', [AppointmentController::class, 'cancel']);
         });
     });
 });
