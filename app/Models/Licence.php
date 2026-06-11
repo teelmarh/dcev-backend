@@ -9,6 +9,7 @@ use App\Models\LicenceAtsepDetail;
 use App\Models\LicenceCabinCrewDetail;
 use App\Models\LicenceFlightDispatchDetail;
 use App\Models\LicencePilotDetail;
+use App\Models\RegionalOffice;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -22,6 +23,7 @@ class Licence extends Model
     {
         return [
             'user_id'                      => 'integer',
+            'pickup_office_id'             => 'integer',
             'initial_issue_date'           => 'date',
             'last_renewal_date'            => 'date',
             'expiry_date'                  => 'date',
@@ -37,6 +39,11 @@ class Licence extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function pickupOffice(): BelongsTo
+    {
+        return $this->belongsTo(RegionalOffice::class, 'pickup_office_id');
     }
 
     public function pilotDetail(): HasOne

@@ -23,10 +23,21 @@ return new class extends Migration
             $table->boolean('active')->default(true);
             $table->timestamps();
         });
+
+        // FK deferred: licences.pickup_office_id references regional_offices which is created after licences
+        Schema::table('licences', function (Blueprint $table) {
+            $table->foreign('pickup_office_id')
+                  ->references('id')->on('regional_offices')
+                  ->nullOnDelete();
+        });
     }
 
     public function down(): void
     {
+        Schema::table('licences', function (Blueprint $table) {
+            $table->dropForeign(['pickup_office_id']);
+        });
+
         Schema::dropIfExists('regional_offices');
     }
 };

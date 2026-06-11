@@ -53,6 +53,7 @@ return new class extends Migration
             // Payment & delivery — FK added in transactions migration (ordering constraint)
             $table->unsignedBigInteger('enrollment_transaction_id')->nullable();
             $table->enum('delivery_method', ['pickup', 'delivery'])->nullable();
+            $table->unsignedBigInteger('pickup_office_id')->nullable();
 
             $table->timestamps();
         });

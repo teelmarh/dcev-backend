@@ -36,5 +36,5 @@ class ForgotPasswordFormRequest extends FormRequest
             'email.exists'   => 'No account found with this email address.',
         ];
     }
-    }
 }
+

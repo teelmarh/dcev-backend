@@ -76,6 +76,7 @@ abstract class StoreLicenceRequest extends FormRequest
 
             // Delivery preference
             'delivery_method'  => 'required|in:pickup,delivery',
+            'pickup_office_id' => 'required_if:delivery_method,pickup|nullable|integer|exists:regional_offices,id',
         ];
     }
 
@@ -92,7 +93,7 @@ abstract class StoreLicenceRequest extends FormRequest
             'has_prior_licence', 'prior_licence_suspended', 'prior_licence_suspended_date',
             'prior_licence_type', 'prior_licence_number', 'prior_licence_issued_date',
             'medical_cert_held', 'medical_cert_class', 'medical_cert_date', 'medical_examiner_name',
-            'id_form', 'id_number', 'delivery_method',
+            'id_form', 'id_number', 'delivery_method', 'pickup_office_id',
         ]);
 
         $user = $this->user();
