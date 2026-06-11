@@ -25,4 +25,13 @@ class CreateVerificationTokenRequest extends FormRequest
             'email' => 'required|string|email|exists:users,email',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email address is required.',
+            'email.email'    => 'Please enter a valid email address.',
+            'email.exists'   => 'No account found with this email address.',
+        ];
+    }
 }

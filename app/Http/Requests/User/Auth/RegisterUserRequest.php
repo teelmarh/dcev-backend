@@ -26,4 +26,15 @@ class RegisterUserRequest extends FormRequest
             'password' => 'nullable|min:8|confirmed',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email address is required.',
+            'email.email'    => 'Please enter a valid email address.',
+            'email.unique'   => 'An account with this email already exists.',
+            'password.min'       => 'Password must be at least 8 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
+        ];
+    }
 }
