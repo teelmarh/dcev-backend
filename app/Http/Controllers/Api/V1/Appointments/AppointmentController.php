@@ -118,16 +118,19 @@ class AppointmentController extends Controller
         }
 
         try {
-            $this->appointmentService->validateDate($office, $licence, $validated['scheduled_date']);
+            $this->appointmentService->validateDate($office, $validated['scheduled_date']);
         } catch (\InvalidArgumentException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
+
+        $assignedTime = $this->appointmentService->assignTimeSlot($office, $validated['scheduled_date']);
 
         $appointment = Appointment::create([
             'user_id'            => $request->user()->id,
             'licence_id'         => $licence->id,
             'regional_office_id' => $office->id,
             'scheduled_date'     => $validated['scheduled_date'],
+            'scheduled_time'     => $assignedTime,
             'status'             => 'pending',
             'notes'              => $validated['notes'] ?? null,
         ]);
@@ -164,17 +167,19 @@ class AppointmentController extends Controller
             ? RegionalOffice::findOrFail($validated['regional_office_id'])
             : $appointment->office;
 
-        $licence = $appointment->licence;
-
         try {
-            $this->appointmentService->validateDate($office, $licence, $validated['scheduled_date']);
+            $this->appointmentService->validateDate($office, $validated['scheduled_date']);
         } catch (\InvalidArgumentException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
 
+        $assignedTime = $this->appointmentService->assignTimeSlot($office, $validated['scheduled_date']);
+
         $appointment->update([
             'previous_date'      => $appointment->scheduled_date,
+            'previous_time'      => $appointment->scheduled_time,
             'scheduled_date'     => $validated['scheduled_date'],
+            'scheduled_time'     => $assignedTime,
             'regional_office_id' => $office->id,
             'status'             => 'rescheduled',
             'notes'              => $validated['notes'] ?? $appointment->notes,

@@ -13,6 +13,8 @@ class Appointment extends Model
         'user_id'        => 'integer',
         'scheduled_date' => 'date',
         'previous_date'  => 'date',
+        'scheduled_time' => 'string',
+        'previous_time'  => 'string',
     ];
 
     public function user(): BelongsTo
