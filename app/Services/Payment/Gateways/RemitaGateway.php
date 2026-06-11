@@ -2,8 +2,10 @@
 
 namespace App\Services\Payment\Gateways;
 
+use App\Exceptions\ExternalServiceException;
 use App\Models\Transaction;
 use App\Services\Payment\Contracts\PaymentGatewayInterface;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -30,18 +32,23 @@ class RemitaGateway implements PaymentGatewayInterface
         $email  = $this->resolveEmail($transaction);
         $hash   = hash('sha512', $this->merchantId . $this->serviceTypeId . $transaction->reference . $transaction->amount . $this->apiKey);
 
-        $response = Http::withHeaders([
-            'Content-Type'  => 'application/json',
-            'Authorization' => "remitaConsumerKey={$this->merchantId},remitaConsumerToken={$hash}",
-        ])->post("{$this->baseUrl}/echannelsvc/merchant/api/paymentinit", [
-            'serviceTypeId' => $this->serviceTypeId,
-            'amount'        => (string) $transaction->amount,
-            'orderId'       => $transaction->reference,
-            'payerName'     => $email,
-            'payerEmail'    => $email,
-            'payerPhone'    => '',
-            'description'   => ucfirst($transaction->type) . ' fee — DCEV',
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'Content-Type'  => 'application/json',
+                'Authorization' => "remitaConsumerKey={$this->merchantId},remitaConsumerToken={$hash}",
+            ])->post("{$this->baseUrl}/echannelsvc/merchant/api/paymentinit", [
+                'serviceTypeId' => $this->serviceTypeId,
+                'amount'        => (string) $transaction->amount,
+                'orderId'       => $transaction->reference,
+                'payerName'     => $email,
+                'payerEmail'    => $email,
+                'payerPhone'    => '',
+                'description'   => ucfirst($transaction->type) . ' fee — DCEV',
+            ]);
+        } catch (ConnectionException $e) {
+            Log::error('Remita connection error during initiate', ['error' => $e->getMessage()]);
+            throw new ExternalServiceException('Payment service is temporarily unavailable. Please try again shortly.');
+        }
 
         // Remita returns JSONP — strip callback wrapper if present
         $raw  = $response->body();
@@ -67,10 +74,15 @@ class RemitaGateway implements PaymentGatewayInterface
     {
         $hash = hash('sha512', $gatewayReference . $this->apiKey . $this->merchantId);
 
-        $response = Http::withHeaders([
-            'Content-Type'  => 'application/json',
-            'Authorization' => "remitaConsumerKey={$this->merchantId},remitaConsumerToken={$hash}",
-        ])->get("{$this->baseUrl}/echannelsvc/{$this->merchantId}/{$gatewayReference}/{$hash}/status.reg");
+        try {
+            $response = Http::withHeaders([
+                'Content-Type'  => 'application/json',
+                'Authorization' => "remitaConsumerKey={$this->merchantId},remitaConsumerToken={$hash}",
+            ])->get("{$this->baseUrl}/echannelsvc/{$this->merchantId}/{$gatewayReference}/{$hash}/status.reg");
+        } catch (ConnectionException $e) {
+            Log::error('Remita connection error during verify', ['error' => $e->getMessage()]);
+            throw new ExternalServiceException('Payment service is temporarily unavailable. Please try again shortly.');
+        }
 
         $body = $response->json();
 

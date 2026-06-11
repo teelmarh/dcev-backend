@@ -5,6 +5,8 @@ namespace App\Services\OneVerify;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\ConnectionException;
+use App\Exceptions\ExternalServiceException;
 use RuntimeException;
 
 class OneVerifyService
@@ -37,12 +39,16 @@ class OneVerifyService
      */
     public function lookupNin(string $nin): array
     {
-        $response = $this->client()->post('/ninAuth/getNINDetails', ['nin' => $nin]);
-
-        if ($response->status() === 401) {
-            // Token may have expired server-side before TTL; force refresh and retry
-            Cache::forget(self::TOKEN_CACHE_KEY);
+        try {
             $response = $this->client()->post('/ninAuth/getNINDetails', ['nin' => $nin]);
+
+            if ($response->status() === 401) {
+                // Token may have expired server-side before TTL; force refresh and retry
+                Cache::forget(self::TOKEN_CACHE_KEY);
+                $response = $this->client()->post('/ninAuth/getNINDetails', ['nin' => $nin]);
+            }
+        } catch (ConnectionException $e) {
+            throw new ExternalServiceException('Identity verification service is temporarily unavailable. Please try again shortly.');
         }
 
         if ($response->failed()) {
@@ -85,14 +91,18 @@ class OneVerifyService
     private function getToken(): string
     {
         return Cache::remember(self::TOKEN_CACHE_KEY, $this->tokenTtl, function () {
-            $response = Http::baseUrl($this->baseUrl)
-                ->withHeaders($this->buildHeaders(withAuth: false))
-                ->acceptJson()
-                ->asJson()
-                ->post('/login', [
-                    'email'    => $this->email,
-                    'password' => $this->password,
-                ]);
+            try {
+                $response = Http::baseUrl($this->baseUrl)
+                    ->withHeaders($this->buildHeaders(withAuth: false))
+                    ->acceptJson()
+                    ->asJson()
+                    ->post('/login', [
+                        'email'    => $this->email,
+                        'password' => $this->password,
+                    ]);
+            } catch (ConnectionException $e) {
+                throw new ExternalServiceException('Identity verification service is temporarily unavailable. Please try again shortly.');
+            }
 
             if ($response->failed()) {
                 throw new RuntimeException(

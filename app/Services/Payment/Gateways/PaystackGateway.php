@@ -2,8 +2,10 @@
 
 namespace App\Services\Payment\Gateways;
 
+use App\Exceptions\ExternalServiceException;
 use App\Models\Transaction;
 use App\Services\Payment\Contracts\PaymentGatewayInterface;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -21,17 +23,22 @@ class PaystackGateway implements PaymentGatewayInterface
 
     public function initiate(Transaction $transaction): array
     {
-        $response = Http::withToken($this->secretKey)
-            ->post("{$this->baseUrl}/transaction/initialize", [
-                'email'     => $this->resolveEmail($transaction),
-                'amount'    => (int) ($transaction->amount * 100), // kobo
-                'reference' => $transaction->reference,
-                'currency'  => $transaction->currency,
-                'metadata'  => [
-                    'transaction_id' => $transaction->id,
-                    'type'           => $transaction->type,
-                ],
-            ]);
+        try {
+            $response = Http::withToken($this->secretKey)
+                ->post("{$this->baseUrl}/transaction/initialize", [
+                    'email'     => $this->resolveEmail($transaction),
+                    'amount'    => (int) ($transaction->amount * 100), // kobo
+                    'reference' => $transaction->reference,
+                    'currency'  => $transaction->currency,
+                    'metadata'  => [
+                        'transaction_id' => $transaction->id,
+                        'type'           => $transaction->type,
+                    ],
+                ]);
+        } catch (ConnectionException $e) {
+            Log::error('Paystack connection error during initiate', ['error' => $e->getMessage()]);
+            throw new ExternalServiceException('Payment service is temporarily unavailable. Please try again shortly.');
+        }
 
         $body = $response->json();
 
@@ -47,8 +54,13 @@ class PaystackGateway implements PaymentGatewayInterface
 
     public function verify(string $gatewayReference): bool
     {
-        $response = Http::withToken($this->secretKey)
-            ->get("{$this->baseUrl}/transaction/verify/{$gatewayReference}");
+        try {
+            $response = Http::withToken($this->secretKey)
+                ->get("{$this->baseUrl}/transaction/verify/{$gatewayReference}");
+        } catch (ConnectionException $e) {
+            Log::error('Paystack connection error during verify', ['error' => $e->getMessage()]);
+            throw new ExternalServiceException('Payment service is temporarily unavailable. Please try again shortly.');
+        }
 
         $body = $response->json();
 

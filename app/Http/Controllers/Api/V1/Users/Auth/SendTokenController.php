@@ -8,6 +8,7 @@ use App\Traits\Api\OtpTraits;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\User\VerifyEmail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\User\VerifyEmailNotification;
 use App\Http\Requests\User\Auth\CreateVerificationTokenRequest;
@@ -23,8 +24,13 @@ class SendTokenController extends Controller
 
         $otp = $this->generate_otp($user->email);
 
-        Notification::send($user, new VerifyEmailNotification($user, $otp?->token));
-        
+        try {
+            Notification::send($user, new VerifyEmailNotification($user, $otp?->token));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send verification email', ['email' => $user->email, 'error' => $e->getMessage()]);
+            return $this->errorResponse('Our email service is temporarily unavailable. Please try again shortly.', 503);
+        }
+
         return $this->showMessage('An OTP has been sent to your email', 200);
 
 
