@@ -1,10 +1,12 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,6 +23,18 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*'),
         );
 
+        // Invalid or expired token → 401
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'data'    => null,
+                    'message' => 'Unauthenticated. Please log in again.',
+                    'success' => false,
+                ], 401);
+            }
+        });
+
+        // Model not found → 404
         $exceptions->render(function (ModelNotFoundException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([
@@ -28,6 +42,18 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message' => 'Resource not found.',
                     'success' => false,
                 ], 404);
+            }
+        });
+
+        // Validation errors → 422 with field-level detail
+        $exceptions->render(function (ValidationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'data'    => null,
+                    'message' => $e->getMessage(),
+                    'errors'  => $e->errors(),
+                    'success' => false,
+                ], 422);
             }
         });
     })->create();
