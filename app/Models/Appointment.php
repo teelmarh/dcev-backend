@@ -10,6 +10,7 @@ class Appointment extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'user_id'        => 'integer',
         'scheduled_date' => 'date',
         'previous_date'  => 'date',
     ];

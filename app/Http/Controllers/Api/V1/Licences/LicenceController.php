@@ -8,7 +8,7 @@ use App\Http\Resources\Licences\LicenceResource;
 use App\Models\Licence;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+// use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class LicenceController extends Controller
 {
