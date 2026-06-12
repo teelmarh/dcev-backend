@@ -11,10 +11,12 @@ use App\Http\Resources\Appointments\RegionalOfficeResource;
 use App\Models\Appointment;
 use App\Models\Licence;
 use App\Models\RegionalOffice;
+use App\Notifications\User\AppointmentBookedNotification;
 use App\Services\Appointment\AppointmentService;
 use App\Traits\Api\ApiResponder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AppointmentController extends Controller
 {
@@ -135,8 +137,19 @@ class AppointmentController extends Controller
             'notes'              => $validated['notes'] ?? null,
         ]);
 
+        $appointment->load('office');
+
+        try {
+            $request->user()->notify(new AppointmentBookedNotification($appointment));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send appointment booking email', [
+                'appointment_id' => $appointment->id,
+                'error'          => $e->getMessage(),
+            ]);
+        }
+
         return $this->dataResponse(
-            new AppointmentResource($appointment->load('office')),
+            new AppointmentResource($appointment),
             'Appointment booked successfully.',
             true,
             201

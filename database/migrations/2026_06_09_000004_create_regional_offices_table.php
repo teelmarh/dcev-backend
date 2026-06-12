@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('address');
             $table->string('phone', 20)->nullable();
             $table->string('email')->nullable();
-            $table->unsignedSmallInteger('daily_capacity')->default(100);
+            $table->unsignedSmallInteger('daily_capacity')->default(96);
             $table->time('working_hours_start')->default('09:00:00');
             $table->time('working_hours_end')->default('16:00:00');
             $table->boolean('active')->default(true);

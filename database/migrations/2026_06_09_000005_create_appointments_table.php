@@ -24,9 +24,11 @@ return new class extends Migration
                 ->noActionOnDelete();
 
             $table->date('scheduled_date');
+            $table->time('scheduled_time')->nullable();
 
             // For audit trail on reschedules
             $table->date('previous_date')->nullable();
+            $table->time('previous_time')->nullable();
 
             $table->enum('status', ['pending', 'confirmed', 'rescheduled', 'completed', 'cancelled'])
                 ->default('pending');
