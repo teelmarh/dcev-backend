@@ -234,4 +234,36 @@ class AppointmentController extends Controller
             200
         );
     }
+
+    /**
+     * GET /v1/appointments/licence?licence_id=X
+     * Returns the active appointment for a given licence, or null if none exists.
+     */
+    public function licenceAppointment(Request $request): JsonResponse
+    {
+        $licenceId = $request->integer('licence_id');
+
+        $licence = Licence::find($licenceId);
+
+        if (! $licence) {
+            return $this->errorResponse('Licence not found.', 404);
+        }
+
+        if ($licence->user_id !== $request->user()->id) {
+            return $this->errorResponse('Forbidden.', 403);
+        }
+
+        $appointment = Appointment::where('licence_id', $licenceId)
+            ->whereNotIn('status', ['cancelled'])
+            ->with('office')
+            ->latest()
+            ->first();
+
+        return $this->dataResponse(
+            $appointment ? new AppointmentResource($appointment) : null,
+            $appointment ? 'Appointment found.' : 'No active appointment for this licence.',
+            true,
+            200
+        );
+    }
 }

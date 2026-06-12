@@ -72,6 +72,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('appointments')->group(function () {
             Route::get('/show',    [AppointmentController::class, 'show']);
             Route::get('/offices', [AppointmentController::class, 'offices']);
+            Route::get('/licence', [AppointmentController::class, 'licenceAppointment']);
             Route::get('/availability/{office}/{date}', [AppointmentController::class, 'availability']);
             Route::patch('/reschedule', [AppointmentController::class, 'reschedule']);
             Route::patch('/cancel',     [AppointmentController::class, 'cancel']);

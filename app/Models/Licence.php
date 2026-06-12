@@ -46,6 +46,11 @@ class Licence extends Model
         return $this->belongsTo(RegionalOffice::class, 'pickup_office_id');
     }
 
+    public function appointment(): HasOne
+    {
+        return $this->hasOne(Appointment::class)->whereNotIn('status', ['cancelled'])->latestOfMany();
+    }
+
     public function pilotDetail(): HasOne
     {
         return $this->hasOne(LicencePilotDetail::class);

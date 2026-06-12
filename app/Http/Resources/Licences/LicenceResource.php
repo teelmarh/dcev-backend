@@ -5,6 +5,7 @@ namespace App\Http\Resources\Licences;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\Appointments\AppointmentResource;
 
 class LicenceResource extends JsonResource
 {
@@ -56,6 +57,10 @@ class LicenceResource extends JsonResource
                 : null,
 
             'detail' => $this->whenLoaded($detailRelation, fn () => $this->{$detailRelation}),
+
+            'appointment' => $this->whenLoaded('appointment', fn () =>
+                $this->appointment ? new AppointmentResource($this->appointment) : null
+            ),
 
             'created_at' => $this->created_at,
         ];

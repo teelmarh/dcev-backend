@@ -27,13 +27,10 @@ class AppointmentService
     {
         $requested = Carbon::parse($date)->startOfDay();
 
-        if ($requested->isSunday()) {
-            throw new \InvalidArgumentException('Appointments cannot be booked on Sundays.');
+        if ($requested->isWeekend()) {
+            throw new \InvalidArgumentException('Appointments cannot be booked on weekends.');
         }
 
-        if ($requested->isSaturday()) {
-            throw new \InvalidArgumentException('Appointments cannot be booked on Saturdays.');
-        }
 
         if (! $this->hasCapacityForDate($office, $date)) {
             throw new \InvalidArgumentException(
@@ -43,27 +40,11 @@ class AppointmentService
     }
 
     /**
-     * Return the assigned session time for a new booking.
-     * Morning (08:00) fills first up to SLOTS_PER_SESSION,
-     * then afternoon (13:00) opens.
+     * Randomly assign morning or afternoon session.
+     * If one session is already full, assign the other.
+     * Both full is prevented upstream by validateDate().
      */
     public function assignTimeSlot(RegionalOffice $office, string $date): string
-    {
-        $morningBooked = Appointment::where('regional_office_id', $office->id)
-            ->whereDate('scheduled_date', $date)
-            ->where('scheduled_time', self::MORNING_TIME)
-            ->whereNotIn('status', ['cancelled'])
-            ->count();
-
-        return $morningBooked < self::SLOTS_PER_SESSION
-            ? self::MORNING_TIME
-            : self::AFTERNOON_TIME;
-    }
-
-    /**
-     * Return availability info for a given office + date, broken into sessions.
-     */
-    public function availability(RegionalOffice $office, string $date): array
     {
         $morningBooked = Appointment::where('regional_office_id', $office->id)
             ->whereDate('scheduled_date', $date)
@@ -77,32 +58,44 @@ class AppointmentService
             ->whereNotIn('status', ['cancelled'])
             ->count();
 
-        $totalBooked = $morningBooked + $afternoonBooked;
-        $totalCapacity = self::SLOTS_PER_SESSION * 2;
+        $morningFull    = $morningBooked >= self::SLOTS_PER_SESSION;
+        $afternoonFull  = $afternoonBooked >= self::SLOTS_PER_SESSION;
+
+        if ($morningFull) {
+            return self::AFTERNOON_TIME;
+        }
+
+        if ($afternoonFull) {
+            return self::MORNING_TIME;
+        }
+
+        // Both sessions have space — pick randomly
+        return (bool) random_int(0, 1) ? self::MORNING_TIME : self::AFTERNOON_TIME;
+    }
+
+    /**
+     * Return availability info for a given office + date.
+     * Capacity is presented as 100 to the client; real cap is 96 (2 × 48).
+     */
+    public function availability(RegionalOffice $office, string $date): array
+    {
+        $totalBooked   = Appointment::where('regional_office_id', $office->id)
+            ->whereDate('scheduled_date', $date)
+            ->whereNotIn('status', ['cancelled'])
+            ->count();
+
+        $realCapacity    = self::SLOTS_PER_SESSION * 2;          // 96
+        $displayCapacity = 100;                                   // shown to client
+        $realRemaining   = max(0, $realCapacity - $totalBooked);
+        $displayRemaining = min($realRemaining, $displayCapacity);
 
         return [
-            'date'   => $date,
-            'office' => $office->slug,
-            'sessions' => [
-                'morning' => [
-                    'time'      => self::MORNING_TIME,
-                    'capacity'  => self::SLOTS_PER_SESSION,
-                    'booked'    => $morningBooked,
-                    'remaining' => max(0, self::SLOTS_PER_SESSION - $morningBooked),
-                    'available' => $morningBooked < self::SLOTS_PER_SESSION,
-                ],
-                'afternoon' => [
-                    'time'      => self::AFTERNOON_TIME,
-                    'capacity'  => self::SLOTS_PER_SESSION,
-                    'booked'    => $afternoonBooked,
-                    'remaining' => max(0, self::SLOTS_PER_SESSION - $afternoonBooked),
-                    'available' => $afternoonBooked < self::SLOTS_PER_SESSION,
-                ],
-            ],
-            'total_capacity'  => $totalCapacity,
-            'total_booked'    => $totalBooked,
-            'total_remaining' => max(0, $totalCapacity - $totalBooked),
-            'available'       => $totalBooked < $totalCapacity,
+            'date'      => $date,
+            'office'    => $office->slug,
+            'capacity'  => $displayCapacity,
+            'booked'    => $totalBooked,
+            'remaining' => $displayRemaining,
+            'available' => $realRemaining > 0,
         ];
     }
 
