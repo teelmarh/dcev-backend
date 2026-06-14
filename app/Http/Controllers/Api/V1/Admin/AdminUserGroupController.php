@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\Group\SyncGroupPermissionsRequest;
 use App\Http\Requests\Admin\Group\UpdateUserGroupRequest;
 use App\Models\UserGroup;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 
 class AdminUserGroupController extends Controller
 {
@@ -25,7 +26,10 @@ class AdminUserGroupController extends Controller
     /** POST /v1/admin/groups */
     public function store(StoreUserGroupRequest $request): JsonResponse
     {
-        $group = UserGroup::create($request->validated());
+        $data = $request->validated();
+        $data['slug'] = Str::slug($data['name']);
+
+        $group = UserGroup::create($data);
 
         return $this->successResponse($this->formatGroup($group->load('permissions')), 201, 'Group created.');
     }
@@ -51,7 +55,12 @@ class AdminUserGroupController extends Controller
             return $this->errorResponse('Group not found.', 404);
         }
 
-        $group->update(collect($request->validated())->except('group_id')->toArray());
+        $data = collect($request->validated())->except('group_id')->toArray();
+        if (isset($data['name'])) {
+            $data['slug'] = Str::slug($data['name']);
+        }
+
+        $group->update($data);
 
         return $this->successResponse($this->formatGroup($group->load('permissions')), 200, 'Group updated.');
     }

@@ -16,6 +16,11 @@ class OfficerAppointmentResource extends JsonResource
             'scheduled_time' => $this->scheduled_time,
             'status'         => $this->status,
             'notes'          => $this->notes,
+            'office'         => $this->whenLoaded('office', fn () => $this->office ? [
+                'id'      => $this->office->id,
+                'name'    => $this->office->name,
+                'address' => $this->office->address,
+            ] : null),
             'applicant'      => $this->whenLoaded('licence', fn () =>
                 $this->licence?->user ? [
                     'id'         => $this->licence->user->id,

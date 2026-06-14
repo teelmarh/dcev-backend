@@ -14,12 +14,14 @@ class OfficerDashboardController extends Controller
 {
     public function applications(Request $request): JsonResponse
     {
-        $query = Licence::with(['user', 'appointment'])
+        $licences = Licence::with(['user', 'appointment'])
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
             ->when($request->query('type'), fn ($q, $type) => $q->where('type', $type))
-            ->latest();
+            ->latest()
+            ->paginate(20);
 
-        $licences = $query->paginate(20);
+        // Eager-load type-specific detail on each licence after pagination
+        $licences->each(fn ($l) => $l->load($l->detailRelationName()));
 
         return $this->successResponse(
             OfficerLicenceResource::collection($licences)->response()->getData(true),
@@ -44,54 +46,62 @@ class OfficerDashboardController extends Controller
             return $this->errorResponse('Application not found.', 404);
         }
 
+        // Load the type-specific detail relation (e.g. asoDetail, pilotDetail, etc.)
+        $licence->load($licence->detailRelationName());
+
+        // Map to a generic key so the resource doesn't need to know the relation name
+        $licence->licenceDetail = $licence->{$licence->detailRelationName()};
+
         return $this->successResponse(new OfficerLicenceResource($licence), 200, 'Application retrieved.');
     }
 
-   
     public function todayAppointments(Request $request): JsonResponse
     {
-        $officeId = $request->user()->regional_office_id;
-
-        if (! $officeId) {
-            return $this->errorResponse('Officer is not assigned to a regional office.', 422);
-        }
-
+        $user = $request->user();
         $today = now()->toDateString();
 
-        $appointments = Appointment::with(['licence.user'])
-            ->where('regional_office_id', $officeId)
+        $query = Appointment::with(['licence.user'])
             ->whereDate('scheduled_date', $today)
             ->whereNotIn('status', ['cancelled'])
-            ->orderBy('scheduled_time')
-            ->get();
+            ->orderBy('scheduled_time');
 
-        return $this->successResponse(OfficerAppointmentResource::collection($appointments), 200, 'Today\'s appointments retrieved.');
-    }
-
-    /**
-     * GET /v1/officer/appointments
-     * Paginated appointments at the officer's office, optional date filter.
-     */
-    public function appointments(Request $request): JsonResponse
-    {
-        $officeId = $request->user()->regional_office_id;
-
-        if (! $officeId) {
-            return $this->errorResponse('Officer is not assigned to a regional office.', 422);
+        if ($user->role !== 'superadmin') {
+            if (! $user->regional_office_id) {
+                return $this->errorResponse('Officer is not assigned to a regional office.', 422);
+            }
+            $query->where('regional_office_id', $user->regional_office_id);
         }
 
-        $appointments = Appointment::with(['licence.user'])
-            ->where('regional_office_id', $officeId)
+        return $this->successResponse(
+            OfficerAppointmentResource::collection($query->get()),
+            200,
+            'Today\'s appointments retrieved.'
+        );
+    }
+
+    public function appointments(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $query = Appointment::with(['licence.user', 'office'])
             ->when($request->query('date'), fn ($q, $date) => $q->whereDate('scheduled_date', $date))
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
+            ->when($request->query('office_id'), fn ($q, $id) => $q->where('regional_office_id', $id))
             ->whereNotIn('status', ['cancelled'])
             ->orderBy('scheduled_date')
-            ->orderBy('scheduled_time')
-            ->paginate(20);
+            ->orderBy('scheduled_time');
+
+        if ($user->role !== 'superadmin') {
+            if (! $user->regional_office_id) {
+                return $this->errorResponse('Officer is not assigned to a regional office.', 422);
+            }
+            $query->where('regional_office_id', $user->regional_office_id);
+        }
 
         return $this->successResponse(
-            OfficerAppointmentResource::collection($appointments)->response()->getData(true),
-            200, 'Appointments retrieved.'
+            OfficerAppointmentResource::collection($query->paginate(20))->response()->getData(true),
+            200,
+            'Appointments retrieved.'
         );
     }
 }
