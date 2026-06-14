@@ -18,7 +18,6 @@ class RegionalOfficeResource extends JsonResource
             'address' => $this->address,
             'phone'   => $this->phone,
             'email'   => $this->email,
-            // Presented as 100 to the client; actual internal cap is 96
             'daily_capacity' => 100,
         ];
     }

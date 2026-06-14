@@ -11,9 +11,6 @@ class RbacSeeder extends Seeder
 {
     public function run(): void
     {
-        // ------------------------------------------------------------------ //
-        // Permissions
-        // ------------------------------------------------------------------ //
         $permissions = [
             [
                 'name'        => 'View Applications',
@@ -51,9 +48,6 @@ class RbacSeeder extends Seeder
             Permission::updateOrCreate(['slug' => $perm['slug']], $perm);
         }
 
-        // ------------------------------------------------------------------ //
-        // Superadmin account
-        // ------------------------------------------------------------------ //
         User::updateOrCreate(
             ['email' => env('SUPERADMIN_EMAIL', 'superadmin@dcev.ncaa.gov.ng')],
             [

@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Group\GroupUserRequest;
+use App\Http\Requests\Admin\Group\StoreUserGroupRequest;
+use App\Http\Requests\Admin\Group\SyncGroupPermissionsRequest;
+use App\Http\Requests\Admin\Group\UpdateUserGroupRequest;
 use App\Models\UserGroup;
-use App\Models\Permission;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class AdminUserGroupController extends Controller
 {
@@ -24,89 +25,108 @@ class AdminUserGroupController extends Controller
     /**
      * POST /v1/admin/groups
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreUserGroupRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'name'        => ['required', 'string', 'max:100', 'unique:user_groups,name'],
-            'description' => ['nullable', 'string', 'max:255'],
-            'active'      => ['sometimes', 'boolean'],
-        ]);
-
-        $group = UserGroup::create($data);
+        $group = UserGroup::create($request->validated());
 
         return $this->successResponse($this->formatGroup($group->load('permissions')), 201, 'Group created.');
     }
 
     /**
-     * PATCH /v1/admin/groups
-     * Body: group_id, name?, description?, active?
+     * GET /v1/admin/groups/{group}
      */
-    public function update(Request $request): JsonResponse
+    public function show(int $group): JsonResponse
     {
-        $data = $request->validate([
-            'group_id'    => ['required', 'integer', 'exists:user_groups,id'],
-            'name'        => ['sometimes', 'string', 'max:100', Rule::unique('user_groups', 'name')->ignore($request->group_id)],
-            'description' => ['nullable', 'string', 'max:255'],
-            'active'      => ['sometimes', 'boolean'],
-        ]);
+        $group = UserGroup::with('permissions', 'users')->find($group);
 
-        $group = UserGroup::find($data['group_id']);
-        $group->update(collect($data)->except('group_id')->toArray());
+        if (! $group) {
+            return $this->errorResponse('Group not found.', 404);
+        }
+
+        return $this->successResponse($this->formatGroup($group), 200);
+    }
+
+    /**
+     * PATCH /v1/admin/groups/{group}
+     */
+    public function update(UpdateUserGroupRequest $request, int $group): JsonResponse
+    {
+        $group = UserGroup::find($group);
+
+        if (! $group) {
+            return $this->errorResponse('Group not found.', 404);
+        }
+
+        $group->update($request->validated());
 
         return $this->successResponse($this->formatGroup($group->load('permissions')), 200, 'Group updated.');
     }
 
     /**
-     * POST /v1/admin/groups/permissions
-     * Sync permissions on a group.
-     * Body: group_id, permission_ids[]
+     * DELETE /v1/admin/groups/{group}
      */
-    public function syncPermissions(Request $request): JsonResponse
+    public function destroy(int $group): JsonResponse
     {
-        $data = $request->validate([
-            'group_id'       => ['required', 'integer', 'exists:user_groups,id'],
-            'permission_ids' => ['required', 'array'],
-            'permission_ids.*' => ['integer', 'exists:permissions,id'],
-        ]);
+        $group = UserGroup::find($group);
 
-        $group = UserGroup::find($data['group_id']);
-        $group->permissions()->sync($data['permission_ids']);
+        if (! $group) {
+            return $this->errorResponse('Group not found.', 404);
+        }
+
+        $group->permissions()->detach();
+        $group->users()->detach();
+        $group->delete();
+
+        return $this->showMessage('Group deleted.', 200);
+    }
+
+    /**
+     * PUT /v1/admin/groups/{group}/permissions
+     * Replace (sync) all permissions on a group.
+     */
+    public function syncPermissions(SyncGroupPermissionsRequest $request, int $group): JsonResponse
+    {
+        $group = UserGroup::find($group);
+
+        if (! $group) {
+            return $this->errorResponse('Group not found.', 404);
+        }
+
+        $group->permissions()->sync($request->permission_ids);
 
         return $this->successResponse($this->formatGroup($group->load('permissions')), 200, 'Permissions updated.');
     }
 
     /**
-     * POST /v1/admin/groups/users
-     * Add a user to a group.
-     * Body: group_id, user_id
+     * POST /v1/admin/groups/{group}/users
+     * Add a user to the group.
      */
-    public function addUser(Request $request): JsonResponse
+    public function addUser(GroupUserRequest $request, int $group): JsonResponse
     {
-        $data = $request->validate([
-            'group_id' => ['required', 'integer', 'exists:user_groups,id'],
-            'user_id'  => ['required', 'integer', 'exists:users,id'],
-        ]);
+        $group = UserGroup::find($group);
 
-        $group = UserGroup::find($data['group_id']);
-        $group->users()->syncWithoutDetaching([$data['user_id']]);
+        if (! $group) {
+            return $this->errorResponse('Group not found.', 404);
+        }
+
+        $group->users()->syncWithoutDetaching([$request->user_id]);
 
         return $this->showMessage('User added to group.', 200);
     }
 
     /**
-     * DELETE /v1/admin/groups/users
-     * Remove a user from a group.
-     * Body: group_id, user_id
+     * DELETE /v1/admin/groups/{group}/users/{user}
+     * Remove a user from the group.
      */
-    public function removeUser(Request $request): JsonResponse
+    public function removeUser(int $group, int $user): JsonResponse
     {
-        $data = $request->validate([
-            'group_id' => ['required', 'integer', 'exists:user_groups,id'],
-            'user_id'  => ['required', 'integer', 'exists:users,id'],
-        ]);
+        $group = UserGroup::find($group);
 
-        $group = UserGroup::find($data['group_id']);
-        $group->users()->detach($data['user_id']);
+        if (! $group) {
+            return $this->errorResponse('Group not found.', 404);
+        }
+
+        $group->users()->detach($user);
 
         return $this->showMessage('User removed from group.', 200);
     }
@@ -126,3 +146,4 @@ class AdminUserGroupController extends Controller
         ];
     }
 }
+

@@ -23,10 +23,6 @@ use App\Http\Controllers\Api\V1\Licences\DeliveryDetailController;
 use App\Http\Controllers\Api\V1\Transactions\TransactionController;
 use App\Http\Controllers\Api\V1\Transactions\WebhookController;
 use App\Http\Controllers\Api\V1\Appointments\AppointmentController;
-use App\Http\Controllers\Api\V1\Officer\OfficerDashboardController;
-use App\Http\Controllers\Api\V1\Admin\AdminUserGroupController;
-use App\Http\Controllers\Api\V1\Admin\AdminPermissionController;
-use App\Http\Controllers\Api\V1\Admin\AdminOfficerController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -80,33 +76,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/availability/{office}/{date}', [AppointmentController::class, 'availability']);
             Route::patch('/reschedule', [AppointmentController::class, 'reschedule']);
             Route::patch('/cancel',     [AppointmentController::class, 'cancel']);
-        });
-
-        // Officer routes
-        Route::middleware('role:officer,superadmin')->prefix('officer')->group(function () {
-            Route::get('/applications',          [OfficerDashboardController::class, 'applications']);
-            Route::get('/applications/{licence}', [OfficerDashboardController::class, 'showApplication']);
-            Route::get('/appointments/today',    [OfficerDashboardController::class, 'todayAppointments']);
-            Route::get('/appointments',          [OfficerDashboardController::class, 'appointments']);
-        });
-
-        // SuperAdmin routes
-        Route::middleware('role:superadmin')->prefix('admin')->group(function () {
-            Route::get('/permissions',   [AdminPermissionController::class, 'index']);
-
-            Route::get('/groups',    [AdminUserGroupController::class, 'index']);
-            Route::post('/groups',   [AdminUserGroupController::class, 'store']);
-            Route::patch('/groups',  [AdminUserGroupController::class, 'update']);
-            Route::post('/groups/permissions', [AdminUserGroupController::class, 'syncPermissions']);
-            Route::post('/groups/users',       [AdminUserGroupController::class, 'addUser']);
-            Route::delete('/groups/users',     [AdminUserGroupController::class, 'removeUser']);
-
-            Route::get('/officers',    [AdminOfficerController::class, 'index']);
-            Route::post('/officers',   [AdminOfficerController::class, 'store']);
-            Route::patch('/officers',  [AdminOfficerController::class, 'update']);
-            Route::delete('/officers', [AdminOfficerController::class, 'destroy']);
-            Route::post('/officers/permissions',   [AdminOfficerController::class, 'grantPermission']);
-            Route::delete('/officers/permissions', [AdminOfficerController::class, 'revokePermission']);
         });
     });
 });

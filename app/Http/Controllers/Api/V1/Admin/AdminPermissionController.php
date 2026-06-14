@@ -16,6 +16,6 @@ class AdminPermissionController extends Controller
     {
         $permissions = Permission::orderBy('slug')->get(['id', 'name', 'slug']);
 
-        return $this->successResponse($permissions, 200);
+        return $this->successResponse($permissions, 200, 'Permissions retrieved.');
     }
 }

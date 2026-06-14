@@ -12,10 +12,6 @@ use Illuminate\Http\Request;
 
 class OfficerDashboardController extends Controller
 {
-    /**
-     * GET /v1/officer/applications
-     * List all licence applications, scoped to the officer's office where relevant.
-     */
     public function applications(Request $request): JsonResponse
     {
         $query = Licence::with(['user', 'appointment'])
@@ -27,14 +23,10 @@ class OfficerDashboardController extends Controller
 
         return $this->successResponse(
             OfficerLicenceResource::collection($licences)->response()->getData(true),
-            200
+            200, 'Applications retrieved.'
         );
     }
 
-    /**
-     * GET /v1/officer/applications/{licence}
-     * Full detail for a single licence application.
-     */
     public function showApplication(int $licence): JsonResponse
     {
         $licence = Licence::with([
@@ -48,13 +40,10 @@ class OfficerDashboardController extends Controller
             return $this->errorResponse('Application not found.', 404);
         }
 
-        return $this->successResponse(new OfficerLicenceResource($licence), 200);
+        return $this->successResponse(new OfficerLicenceResource($licence), 200, 'Application retrieved.');
     }
 
-    /**
-     * GET /v1/officer/appointments/today
-     * Appointments scheduled at the authenticated officer's office for today.
-     */
+   
     public function todayAppointments(Request $request): JsonResponse
     {
         $officeId = $request->user()->regional_office_id;
@@ -72,7 +61,7 @@ class OfficerDashboardController extends Controller
             ->orderBy('scheduled_time')
             ->get();
 
-        return $this->successResponse(OfficerAppointmentResource::collection($appointments), 200);
+        return $this->successResponse(OfficerAppointmentResource::collection($appointments), 200, 'Today\'s appointments retrieved.');
     }
 
     /**
@@ -98,7 +87,7 @@ class OfficerDashboardController extends Controller
 
         return $this->successResponse(
             OfficerAppointmentResource::collection($appointments)->response()->getData(true),
-            200
+            200, 'Appointments retrieved.'
         );
     }
 }

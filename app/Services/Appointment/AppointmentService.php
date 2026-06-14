@@ -8,21 +8,10 @@ use Carbon\Carbon;
 
 class AppointmentService
 {
-    /**
-     * Each session holds 48 people.
-     * Morning fills first; afternoon opens once morning is full.
-     */
     private const SLOTS_PER_SESSION = 48;
     private const MORNING_TIME      = '08:00';
     private const AFTERNOON_TIME    = '13:00';
 
-    /**
-     * Validate that the requested date is:
-     *  - a weekday (Mon–Sat, no Sundays)
-     *  - still has capacity across both sessions
-     *
-     * Throws \InvalidArgumentException on failure.
-     */
     public function validateDate(RegionalOffice $office, string $date): void
     {
         $requested = Carbon::parse($date)->startOfDay();
@@ -39,11 +28,7 @@ class AppointmentService
         }
     }
 
-    /**
-     * Randomly assign morning or afternoon session.
-     * If one session is already full, assign the other.
-     * Both full is prevented upstream by validateDate().
-     */
+  
     public function assignTimeSlot(RegionalOffice $office, string $date): string
     {
         $morningBooked = Appointment::where('regional_office_id', $office->id)
@@ -73,10 +58,7 @@ class AppointmentService
         return (bool) random_int(0, 1) ? self::MORNING_TIME : self::AFTERNOON_TIME;
     }
 
-    /**
-     * Return availability info for a given office + date.
-     * Capacity is presented as 100 to the client; real cap is 96 (2 × 48).
-     */
+   
     public function availability(RegionalOffice $office, string $date): array
     {
         $totalBooked   = Appointment::where('regional_office_id', $office->id)

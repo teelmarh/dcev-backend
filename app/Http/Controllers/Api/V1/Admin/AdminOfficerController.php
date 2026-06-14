@@ -3,23 +3,23 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Officer\StoreOfficerRequest;
+use App\Http\Requests\Admin\Officer\UpdateOfficerRequest;
 use App\Http\Resources\Users\UserResource;
-use App\Models\Permission;
-use App\Models\RegionalOffice;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AdminOfficerController extends Controller
 {
     /**
      * GET /v1/admin/officers
-     * List all officers.
      */
     public function index(Request $request): JsonResponse
     {
-        $officers = User::whereIn('role', ['officer', 'superadmin'])
+        $officers = User::where('role', 'officer')
             ->with('regionalOffice')
             ->when($request->query('office_id'), fn ($q, $id) => $q->where('regional_office_id', $id))
             ->paginate(20);
@@ -32,114 +32,77 @@ class AdminOfficerController extends Controller
 
     /**
      * POST /v1/admin/officers
-     * Promote an existing user to officer and assign an office.
-     * Body: user_id, regional_office_id
+     * Create a new officer account with a system-generated default password.
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreOfficerRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'user_id'            => ['required', 'integer', 'exists:users,id'],
-            'regional_office_id' => ['required', 'integer', 'exists:regional_offices,id'],
-        ]);
+        $defaultPassword = 'Officer@' . Str::upper(Str::random(6));
 
-        $user = User::find($data['user_id']);
-
-        if ($user->role === 'superadmin') {
-            return $this->errorResponse('Cannot modify a superadmin account.', 422);
-        }
-
-        $user->update([
+        $officer = User::create([
+            'first_name'         => $request->first_name,
+            'last_name'          => $request->last_name,
+            'email'              => $request->email,
+            'phone'              => $request->phone,
+            'password'           => Hash::make($defaultPassword),
             'role'               => 'officer',
-            'regional_office_id' => $data['regional_office_id'],
+            'regional_office_id' => $request->regional_office_id,
+            'email_verified_at'  => now(),
         ]);
 
-        return $this->successResponse(new UserResource($user->fresh('regionalOffice')), 200, 'User promoted to officer.');
+        return $this->successResponse([
+            'officer'          => new UserResource($officer->load('regionalOffice')),
+            'default_password' => $defaultPassword,
+        ], 201, 'Officer account created.');
     }
 
     /**
-     * PATCH /v1/admin/officers
+     * GET /v1/admin/officers/{officer}
+     */
+    public function show(int $officer): JsonResponse
+    {
+        $officer = User::where('role', 'officer')->with('regionalOffice', 'userGroups.permissions', 'directPermissions')->find($officer);
+
+        if (! $officer) {
+            return $this->errorResponse('Officer not found.', 404);
+        }
+
+        return $this->successResponse(new UserResource($officer), 200);
+    }
+
+    /**
+     * PATCH /v1/admin/officers/{officer}
      * Update an officer's assigned office.
-     * Body: user_id, regional_office_id
      */
-    public function update(Request $request): JsonResponse
+    public function update(UpdateOfficerRequest $request, int $officer): JsonResponse
     {
-        $data = $request->validate([
-            'user_id'            => ['required', 'integer', 'exists:users,id'],
-            'regional_office_id' => ['required', 'integer', 'exists:regional_offices,id'],
-        ]);
+        $officer = User::where('role', 'officer')->find($officer);
 
-        $user = User::find($data['user_id']);
-
-        if ($user->role !== 'officer') {
-            return $this->errorResponse('User is not an officer.', 422);
+        if (! $officer) {
+            return $this->errorResponse('Officer not found.', 404);
         }
 
-        $user->update(['regional_office_id' => $data['regional_office_id']]);
+        $officer->update(['regional_office_id' => $request->regional_office_id]);
 
-        return $this->successResponse(new UserResource($user->fresh('regionalOffice')), 200, 'Officer office updated.');
+        return $this->successResponse(new UserResource($officer->load('regionalOffice')), 200, 'Officer updated.');
     }
 
     /**
-     * DELETE /v1/admin/officers
-     * Revoke officer role, return user to applicant.
-     * Body: user_id
+     * DELETE /v1/admin/officers/{officer}
+     * Permanently delete the officer account.
      */
-    public function destroy(Request $request): JsonResponse
+    public function destroy(int $officer): JsonResponse
     {
-        $data = $request->validate([
-            'user_id' => ['required', 'integer', 'exists:users,id'],
-        ]);
+        $officer = User::where('role', 'officer')->find($officer);
 
-        $user = User::find($data['user_id']);
-
-        if ($user->role !== 'officer') {
-            return $this->errorResponse('User is not an officer.', 422);
+        if (! $officer) {
+            return $this->errorResponse('Officer not found.', 404);
         }
 
-        $user->update([
-            'role'               => 'applicant',
-            'regional_office_id' => null,
-        ]);
+        $officer->userGroups()->detach();
+        $officer->directPermissions()->detach();
+        $officer->tokens()->delete();
+        $officer->delete();
 
-        // detach all group memberships
-        $user->userGroups()->detach();
-
-        return $this->showMessage('Officer role revoked.', 200);
-    }
-
-    /**
-     * POST /v1/admin/officers/permissions
-     * Assign a direct permission to an officer.
-     * Body: user_id, permission_id
-     */
-    public function grantPermission(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'user_id'       => ['required', 'integer', 'exists:users,id'],
-            'permission_id' => ['required', 'integer', 'exists:permissions,id'],
-        ]);
-
-        $user = User::find($data['user_id']);
-        $user->directPermissions()->syncWithoutDetaching([$data['permission_id']]);
-
-        return $this->showMessage('Permission granted.', 200);
-    }
-
-    /**
-     * DELETE /v1/admin/officers/permissions
-     * Revoke a direct permission from an officer.
-     * Body: user_id, permission_id
-     */
-    public function revokePermission(Request $request): JsonResponse
-    {
-        $data = $request->validate([
-            'user_id'       => ['required', 'integer', 'exists:users,id'],
-            'permission_id' => ['required', 'integer', 'exists:permissions,id'],
-        ]);
-
-        $user = User::find($data['user_id']);
-        $user->directPermissions()->detach($data['permission_id']);
-
-        return $this->showMessage('Permission revoked.', 200);
+        return $this->showMessage('Officer account deleted.', 200);
     }
 }

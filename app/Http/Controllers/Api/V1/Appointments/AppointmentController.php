@@ -235,10 +235,7 @@ class AppointmentController extends Controller
         );
     }
 
-    /**
-     * GET /v1/appointments/licence?licence_id=X
-     * Returns the active appointment for a given licence, or null if none exists.
-     */
+   
     public function licenceAppointment(Request $request): JsonResponse
     {
         $licenceId = $request->integer('licence_id');
