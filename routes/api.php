@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\V1\Licences\DeliveryDetailController;
 use App\Http\Controllers\Api\V1\Transactions\TransactionController;
 use App\Http\Controllers\Api\V1\Transactions\WebhookController;
 use App\Http\Controllers\Api\V1\Appointments\AppointmentController;
+use App\Http\Controllers\Api\V1\Officer\OfficerDashboardController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -76,6 +77,14 @@ Route::prefix('v1')->group(function () {
             Route::get('/availability/{office}/{date}', [AppointmentController::class, 'availability']);
             Route::patch('/reschedule', [AppointmentController::class, 'reschedule']);
             Route::patch('/cancel',     [AppointmentController::class, 'cancel']);
+        });
+
+        // Officer routes
+        Route::middleware('role:officer,superadmin')->prefix('officer')->group(function () {
+            Route::get('/applications',          [OfficerDashboardController::class, 'applications']);
+            Route::get('/applications/{licence}', [OfficerDashboardController::class, 'showApplication']);
+            Route::get('/appointments/today',    [OfficerDashboardController::class, 'todayAppointments']);
+            Route::get('/appointments',          [OfficerDashboardController::class, 'appointments']);
         });
     });
 });
