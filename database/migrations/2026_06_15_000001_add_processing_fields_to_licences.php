@@ -9,9 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('licences', function (Blueprint $table) {
-            // Officer who processed (approved/rejected/returned) the application
             $table->unsignedBigInteger('processed_by')->nullable()->after('pickup_office_id');
-            // Timestamp when the application was processed
             $table->timestamp('processed_at')->nullable()->after('processed_by');
 
             // FK added separately (officer could be deleted — set null rather than cascade)
