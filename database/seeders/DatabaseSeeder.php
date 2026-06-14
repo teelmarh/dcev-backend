@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        $this->call(RegionalOfficeSeeder::class);
+        $this->call([
+            RegionalOfficeSeeder::class,
+            RbacSeeder::class,
+        ]);
     }
 }

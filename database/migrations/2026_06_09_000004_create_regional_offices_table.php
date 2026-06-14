@@ -30,10 +30,21 @@ return new class extends Migration
                   ->references('id')->on('regional_offices')
                   ->nullOnDelete();
         });
+
+        // FK deferred: users.regional_office_id references regional_offices (officer assignment)
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('regional_office_id')
+                  ->references('id')->on('regional_offices')
+                  ->nullOnDelete();
+        });
     }
 
     public function down(): void
     {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['regional_office_id']);
+        });
+
         Schema::table('licences', function (Blueprint $table) {
             $table->dropForeign(['pickup_office_id']);
         });

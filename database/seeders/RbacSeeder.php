@@ -1,0 +1,69 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Permission;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
+class RbacSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // ------------------------------------------------------------------ //
+        // Permissions
+        // ------------------------------------------------------------------ //
+        $permissions = [
+            [
+                'name'        => 'View Applications',
+                'slug'        => 'view_applications',
+                'description' => 'Browse and search licence applications',
+            ],
+            [
+                'name'        => 'Process Application',
+                'slug'        => 'process_application',
+                'description' => 'Update application status (approve / reject / return)',
+            ],
+            [
+                'name'        => 'Manage Appointments',
+                'slug'        => 'manage_appointments',
+                'description' => 'View, reschedule, or cancel biometric appointments',
+            ],
+            [
+                'name'        => 'View Reports',
+                'slug'        => 'view_reports',
+                'description' => 'Access statistical and operational reports',
+            ],
+            [
+                'name'        => 'Manage Officers',
+                'slug'        => 'manage_officers',
+                'description' => 'Create, update, and deactivate officer accounts',
+            ],
+            [
+                'name'        => 'Manage Groups',
+                'slug'        => 'manage_groups',
+                'description' => 'Create user groups and assign permissions / members',
+            ],
+        ];
+
+        foreach ($permissions as $perm) {
+            Permission::updateOrCreate(['slug' => $perm['slug']], $perm);
+        }
+
+        // ------------------------------------------------------------------ //
+        // Superadmin account
+        // ------------------------------------------------------------------ //
+        User::updateOrCreate(
+            ['email' => env('SUPERADMIN_EMAIL', 'superadmin@dcev.ncaa.gov.ng')],
+            [
+                'first_name'        => 'Super',
+                'last_name'         => 'Admin',
+                'email'             => env('SUPERADMIN_EMAIL', 'superadmin@dcev.ncaa.gov.ng'),
+                'password'          => Hash::make(env('SUPERADMIN_PASSWORD', 'Admin@DCEV2026!')),
+                'role'              => 'superadmin',
+                'email_verified_at' => now(),
+            ]
+        );
+    }
+}

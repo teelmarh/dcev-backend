@@ -39,6 +39,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['applicant', 'officer', 'superadmin'])->default('applicant');
+            $table->unsignedBigInteger('regional_office_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
