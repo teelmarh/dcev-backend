@@ -62,6 +62,34 @@ class LicenceResource extends JsonResource
                 $this->appointment ? new AppointmentResource($this->appointment) : null
             ),
 
+            // --- Officer-facing fields (only present when officer endpoint loads these relations) ---
+            'applicant' => $this->whenLoaded('user', fn () => [
+                'id'         => $this->user->id,
+                'first_name' => $this->user->first_name,
+                'last_name'  => $this->user->last_name,
+                'email'      => $this->user->email,
+                'phone'      => $this->user->phone,
+                'nin'        => $this->user->nin,
+            ]),
+
+            'delivery' => $this->whenLoaded('deliveryDetail', fn () => $this->deliveryDetail ? [
+                'delivery_method' => $this->deliveryDetail->delivery_method,
+                'address'         => $this->deliveryDetail->address,
+                'city'            => $this->deliveryDetail->city,
+                'state'           => $this->deliveryDetail->state,
+            ] : null),
+
+            'enrollment_transaction' => $this->whenLoaded('enrollmentTransaction', fn () =>
+                $this->enrollmentTransaction ? [
+                    'id'             => $this->enrollmentTransaction->id,
+                    'reference'      => $this->enrollmentTransaction->reference,
+                    'amount'         => $this->enrollmentTransaction->amount,
+                    'status'         => $this->enrollmentTransaction->status,
+                    'payment_method' => $this->enrollmentTransaction->payment_method,
+                    'paid_at'        => $this->enrollmentTransaction->paid_at,
+                ] : null
+            ),
+
             'created_at' => $this->created_at,
         ];
     }

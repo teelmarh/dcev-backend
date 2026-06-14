@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Officer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Licences\LicenceResource;
 use App\Http\Resources\Officer\OfficerAppointmentResource;
-use App\Http\Resources\Officer\OfficerLicenceResource;
 use App\Models\Appointment;
 use App\Models\Licence;
 use App\Models\User;
@@ -26,7 +26,7 @@ class OfficerDashboardController extends Controller
         $licences->each(fn ($l) => $l->load($l->detailRelationName()));
 
         return $this->successResponse(
-            OfficerLicenceResource::collection($licences)->response()->getData(true),
+            LicenceResource::collection($licences)->response()->getData(true),
             200, 'Applications retrieved.'
         );
     }
@@ -48,13 +48,9 @@ class OfficerDashboardController extends Controller
             return $this->errorResponse('Application not found.', 404);
         }
 
-        // Load the type-specific detail relation (e.g. asoDetail, pilotDetail, etc.)
         $licence->load($licence->detailRelationName());
 
-        // Map to a generic key so the resource doesn't need to know the relation name
-        $licence->licenceDetail = $licence->{$licence->detailRelationName()};
-
-        return $this->successResponse(new OfficerLicenceResource($licence), 200, 'Application retrieved.');
+        return $this->successResponse(new LicenceResource($licence), 200, 'Application retrieved.');
     }
 
     public function todayAppointments(Request $request): JsonResponse
