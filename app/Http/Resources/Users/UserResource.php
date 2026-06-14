@@ -28,6 +28,8 @@ class UserResource extends JsonResource
             'empic_status'       => $this->empic_status,
             'empic_customer_no'  => $this->empic_customer_no,
             'empic_address_id'   => $this->empic_address_id,
+            'role'               => $this->role,
+            'regional_office_id' => $this->regional_office_id,
             'created_at'         => $this->created_at,
         ];
     }
