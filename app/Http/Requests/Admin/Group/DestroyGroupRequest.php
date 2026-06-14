@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin\Group;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class GroupUserRequest extends FormRequest
+class DestroyGroupRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,7 +15,6 @@ class GroupUserRequest extends FormRequest
     {
         return [
             'group_id' => ['required', 'integer', 'exists:user_groups,id'],
-            'user_id'  => ['required', 'integer', 'exists:users,id'],
         ];
     }
 }

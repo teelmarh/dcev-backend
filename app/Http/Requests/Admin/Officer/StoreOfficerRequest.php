@@ -19,6 +19,7 @@ class StoreOfficerRequest extends FormRequest
             'email'              => ['required', 'email', 'max:255', 'unique:users,email'],
             'phone'              => ['required', 'string', 'max:20'],
             'regional_office_id' => ['required', 'integer', 'exists:regional_offices,id'],
+            'role'               => ['sometimes', 'in:officer,superadmin'],
         ];
     }
 }

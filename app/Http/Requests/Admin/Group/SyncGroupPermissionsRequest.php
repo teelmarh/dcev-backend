@@ -14,6 +14,7 @@ class SyncGroupPermissionsRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'group_id'         => ['required', 'integer', 'exists:user_groups,id'],
             'permission_ids'   => ['required', 'array'],
             'permission_ids.*' => ['integer', 'exists:permissions,id'],
         ];

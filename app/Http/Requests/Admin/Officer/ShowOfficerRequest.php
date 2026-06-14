@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin\Officer;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateOfficerRequest extends FormRequest
+class ShowOfficerRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,8 +14,7 @@ class UpdateOfficerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'officer_id'         => ['required', 'integer', 'exists:users,id'],
-            'regional_office_id' => ['required', 'integer', 'exists:regional_offices,id'],
+            'officer_id' => ['required', 'integer', 'exists:users,id'],
         ];
     }
 }

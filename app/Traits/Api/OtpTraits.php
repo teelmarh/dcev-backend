@@ -6,24 +6,27 @@ use Ichtrojan\Otp\Otp;
 
 trait OtpTraits
 {
-    private $length = 6; // lenght digit to generate
+    private int $length = 6;
 
-    private $validity_period = 10; // validity period in minute
+    private int $validity_period = 10; // minutes
 
-    protected function generate_otp($email)
+    protected function generate_otp(string $email, int $validityMinutes = 0): object
     {
         $otpobj = new Otp;
-        $otp = $otpobj->generate($email, 'numeric', (int) $this->length, $this->validity_period);
 
-        return $otp;
+        return $otpobj->generate(
+            $email,
+            'numeric',
+            $this->length,
+            $validityMinutes > 0 ? $validityMinutes : $this->validity_period
+        );
     }
 
-    protected function validate_otp($detail)
+    protected function validate_otp(array $detail): object
     {
         $otpobj = new Otp;
 
-        $response = $otpobj->validate($detail['email'], $detail['otp']);
-
-        return $response;
+        return $otpobj->validate($detail['email'], $detail['otp']);
     }
 }
+

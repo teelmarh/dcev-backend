@@ -14,6 +14,7 @@ class OfficerPermissionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'officer_id'    => ['required', 'integer', 'exists:users,id'],
             'permission_id' => ['required', 'integer', 'exists:permissions,id'],
         ];
     }

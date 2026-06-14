@@ -27,14 +27,18 @@ class OfficerDashboardController extends Controller
         );
     }
 
-    public function showApplication(int $licence): JsonResponse
+    public function showApplication(Request $request): JsonResponse
     {
+        $request->validate([
+            'licence_id' => ['required', 'integer', 'exists:licences,id'],
+        ]);
+
         $licence = Licence::with([
             'user',
             'appointment.office',
             'deliveryDetail',
             'enrollmentTransaction',
-        ])->find($licence);
+        ])->find($request->licence_id);
 
         if (! $licence) {
             return $this->errorResponse('Application not found.', 404);

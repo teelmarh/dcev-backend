@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Group\DestroyGroupRequest;
 use App\Http\Requests\Admin\Group\GroupUserRequest;
+use App\Http\Requests\Admin\Group\ShowGroupRequest;
 use App\Http\Requests\Admin\Group\StoreUserGroupRequest;
 use App\Http\Requests\Admin\Group\SyncGroupPermissionsRequest;
 use App\Http\Requests\Admin\Group\UpdateUserGroupRequest;
@@ -12,19 +14,15 @@ use Illuminate\Http\JsonResponse;
 
 class AdminUserGroupController extends Controller
 {
-    /**
-     * GET /v1/admin/groups
-     */
+    /** GET /v1/admin/groups */
     public function index(): JsonResponse
     {
         $groups = UserGroup::with('permissions')->get();
 
-        return $this->successResponse($groups->map(fn ($g) => $this->formatGroup($g)), 200);
+        return $this->successResponse($groups->map(fn ($g) => $this->formatGroup($g)), 200, 'Groups retrieved.');
     }
 
-    /**
-     * POST /v1/admin/groups
-     */
+    /** POST /v1/admin/groups */
     public function store(StoreUserGroupRequest $request): JsonResponse
     {
         $group = UserGroup::create($request->validated());
@@ -32,42 +30,36 @@ class AdminUserGroupController extends Controller
         return $this->successResponse($this->formatGroup($group->load('permissions')), 201, 'Group created.');
     }
 
-    /**
-     * GET /v1/admin/groups/{group}
-     */
-    public function show(int $group): JsonResponse
+    /** GET /v1/admin/groups/show */
+    public function show(ShowGroupRequest $request): JsonResponse
     {
-        $group = UserGroup::with('permissions', 'users')->find($group);
+        $group = UserGroup::with('permissions', 'users')->find($request->group_id);
 
         if (! $group) {
             return $this->errorResponse('Group not found.', 404);
         }
 
-        return $this->successResponse($this->formatGroup($group), 200);
+        return $this->successResponse($this->formatGroup($group), 200, 'Group retrieved.');
     }
 
-    /**
-     * PATCH /v1/admin/groups/{group}
-     */
-    public function update(UpdateUserGroupRequest $request, int $group): JsonResponse
+    /** PATCH /v1/admin/groups */
+    public function update(UpdateUserGroupRequest $request): JsonResponse
     {
-        $group = UserGroup::find($group);
+        $group = UserGroup::find($request->group_id);
 
         if (! $group) {
             return $this->errorResponse('Group not found.', 404);
         }
 
-        $group->update($request->validated());
+        $group->update(collect($request->validated())->except('group_id')->toArray());
 
         return $this->successResponse($this->formatGroup($group->load('permissions')), 200, 'Group updated.');
     }
 
-    /**
-     * DELETE /v1/admin/groups/{group}
-     */
-    public function destroy(int $group): JsonResponse
+    /** DELETE /v1/admin/groups */
+    public function destroy(DestroyGroupRequest $request): JsonResponse
     {
-        $group = UserGroup::find($group);
+        $group = UserGroup::find($request->group_id);
 
         if (! $group) {
             return $this->errorResponse('Group not found.', 404);
@@ -81,12 +73,13 @@ class AdminUserGroupController extends Controller
     }
 
     /**
-     * PUT /v1/admin/groups/{group}/permissions
+     * PUT /v1/admin/groups/permissions
      * Replace (sync) all permissions on a group.
+     * Body: group_id, permission_ids[]
      */
-    public function syncPermissions(SyncGroupPermissionsRequest $request, int $group): JsonResponse
+    public function syncPermissions(SyncGroupPermissionsRequest $request): JsonResponse
     {
-        $group = UserGroup::find($group);
+        $group = UserGroup::find($request->group_id);
 
         if (! $group) {
             return $this->errorResponse('Group not found.', 404);
@@ -94,16 +87,17 @@ class AdminUserGroupController extends Controller
 
         $group->permissions()->sync($request->permission_ids);
 
-        return $this->successResponse($this->formatGroup($group->load('permissions')), 200, 'Permissions updated.');
+        return $this->successResponse($this->formatGroup($group->load('permissions')), 200, 'Group permissions updated.');
     }
 
     /**
-     * POST /v1/admin/groups/{group}/users
+     * POST /v1/admin/groups/users
      * Add a user to the group.
+     * Body: group_id, user_id
      */
-    public function addUser(GroupUserRequest $request, int $group): JsonResponse
+    public function addUser(GroupUserRequest $request): JsonResponse
     {
-        $group = UserGroup::find($group);
+        $group = UserGroup::find($request->group_id);
 
         if (! $group) {
             return $this->errorResponse('Group not found.', 404);
@@ -115,18 +109,19 @@ class AdminUserGroupController extends Controller
     }
 
     /**
-     * DELETE /v1/admin/groups/{group}/users/{user}
+     * DELETE /v1/admin/groups/users
      * Remove a user from the group.
+     * Body: group_id, user_id
      */
-    public function removeUser(int $group, int $user): JsonResponse
+    public function removeUser(GroupUserRequest $request): JsonResponse
     {
-        $group = UserGroup::find($group);
+        $group = UserGroup::find($request->group_id);
 
         if (! $group) {
             return $this->errorResponse('Group not found.', 404);
         }
 
-        $group->users()->detach($user);
+        $group->users()->detach($request->user_id);
 
         return $this->showMessage('User removed from group.', 200);
     }
@@ -146,4 +141,5 @@ class AdminUserGroupController extends Controller
         ];
     }
 }
+
 
