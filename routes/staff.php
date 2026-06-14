@@ -3,8 +3,12 @@
 use App\Http\Controllers\Api\V1\Admin\AdminOfficerController;
 use App\Http\Controllers\Api\V1\Admin\AdminOfficerPermissionController;
 use App\Http\Controllers\Api\V1\Admin\AdminPermissionController;
+use App\Http\Controllers\Api\V1\Admin\AdminRegionalOfficeController;
 use App\Http\Controllers\Api\V1\Admin\AdminUserGroupController;
 use App\Http\Controllers\Api\V1\Officer\OfficerDashboardController;
+use App\Http\Controllers\Api\V1\Officer\OfficerDeliveryController;
+use App\Http\Controllers\Api\V1\Officer\OfficerHandledApplicationsController;
+use App\Http\Controllers\Api\V1\Officer\OfficerRegionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,11 +17,23 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth:sanctum', 'role:officer,superadmin'])->prefix('v1/officer')->group(function () {
+    // Dashboard
     Route::get('/applications',           [OfficerDashboardController::class, 'applications']);
     Route::get('/applications/show',      [OfficerDashboardController::class, 'showApplication']);
     Route::get('/appointments/today',     [OfficerDashboardController::class, 'todayAppointments']);
     Route::get('/appointments',           [OfficerDashboardController::class, 'appointments']);
     Route::get('/stats',                  [OfficerDashboardController::class, 'stats']);
+
+    // Applications handled by officer (permission: view_handled_applications)
+    Route::get('/handled-applications',   [OfficerHandledApplicationsController::class, 'index']);
+
+    // Region oversight (permission: oversee_regions)
+    Route::get('/regions',                [OfficerRegionController::class, 'index']);
+    Route::get('/regions/appointments',   [OfficerRegionController::class, 'appointments']);
+
+    // Delivery / dispatch management (permission: manage_delivery)
+    Route::get('/delivery/dispatch',      [OfficerDeliveryController::class, 'dispatch']);
+    Route::get('/delivery/show',          [OfficerDeliveryController::class, 'show']);
 });
 
 /*
@@ -53,4 +69,12 @@ Route::middleware(['auth:sanctum', 'role:superadmin'])->prefix('v1/admin')->grou
     Route::put('/groups/permissions',    [AdminUserGroupController::class, 'syncPermissions']);
     Route::post('/groups/users',         [AdminUserGroupController::class, 'addUser']);
     Route::delete('/groups/users',       [AdminUserGroupController::class, 'removeUser']);
+
+    // Regional office management
+    Route::get('/regions',               [AdminRegionalOfficeController::class, 'index']);
+    Route::post('/regions',              [AdminRegionalOfficeController::class, 'store']);
+    Route::get('/regions/show',          [AdminRegionalOfficeController::class, 'show']);
+    Route::patch('/regions',             [AdminRegionalOfficeController::class, 'update']);
+    Route::delete('/regions',            [AdminRegionalOfficeController::class, 'destroy']);
+    Route::patch('/regions/capacity',    [AdminRegionalOfficeController::class, 'updateCapacity']);
 });

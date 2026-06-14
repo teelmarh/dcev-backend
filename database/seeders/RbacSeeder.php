@@ -42,6 +42,21 @@ class RbacSeeder extends Seeder
                 'slug'        => 'manage_groups',
                 'description' => 'Create user groups and assign permissions / members',
             ],
+            [
+                'name'        => 'Oversee Regions',
+                'slug'        => 'oversee_regions',
+                'description' => 'View appointments and booking metrics across all regional offices',
+            ],
+            [
+                'name'        => 'View Handled Applications',
+                'slug'        => 'view_handled_applications',
+                'description' => 'View applications that have been processed by officers',
+            ],
+            [
+                'name'        => 'Manage Delivery',
+                'slug'        => 'manage_delivery',
+                'description' => 'View delivery details and the full dispatch list for pickup and courier items',
+            ],
         ];
 
         foreach ($permissions as $perm) {
