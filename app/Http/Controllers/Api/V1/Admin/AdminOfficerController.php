@@ -25,6 +25,13 @@ class AdminOfficerController extends Controller
         $officers = User::whereIn('role', ['officer', 'superadmin'])
             ->with('regionalOffice')
             ->when($request->query('office_id'), fn ($q, $id) => $q->where('regional_office_id', $id))
+            ->when($request->query('search'), function ($q, $search) {
+                $q->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                      ->orWhere('last_name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
             ->paginate(20);
 
         return $this->successResponse(

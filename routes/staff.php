@@ -17,6 +17,7 @@ Route::middleware(['auth:sanctum', 'role:officer,superadmin'])->prefix('v1/offic
     Route::get('/applications/show',      [OfficerDashboardController::class, 'showApplication']);
     Route::get('/appointments/today',     [OfficerDashboardController::class, 'todayAppointments']);
     Route::get('/appointments',           [OfficerDashboardController::class, 'appointments']);
+    Route::get('/stats',                  [OfficerDashboardController::class, 'stats']);
 });
 
 /*

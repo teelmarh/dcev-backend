@@ -7,8 +7,10 @@ use App\Http\Resources\Officer\OfficerAppointmentResource;
 use App\Http\Resources\Officer\OfficerLicenceResource;
 use App\Models\Appointment;
 use App\Models\Licence;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OfficerDashboardController extends Controller
 {
@@ -104,4 +106,53 @@ class OfficerDashboardController extends Controller
             'Appointments retrieved.'
         );
     }
+
+    /**
+     * GET /v1/officer/stats?officer_id=X (superadmin scoped)
+     * GET /v1/officer/stats             (own stats when called by officer)
+     *
+     * Returns: total processed, breakdown by action (approved/rejected/returned),
+     *          average hours from initial_issue_date → processed_at.
+     */
+    public function stats(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        // Superadmin may pass officer_id to view any officer's stats
+        if ($user->role === 'superadmin' && $request->filled('officer_id')) {
+            $request->validate(['officer_id' => ['integer', 'exists:users,id']]);
+            $officerId = (int) $request->officer_id;
+        } else {
+            $officerId = $user->id;
+        }
+
+        $processed = Licence::where('processed_by', $officerId)
+            ->whereNotNull('processed_at')
+            ->get(['status', 'initial_issue_date', 'processed_at']);
+
+        $total = $processed->count();
+
+        $byStatus = $processed->groupBy('status')->map->count();
+
+        // Average processing time in hours: processed_at − initial_issue_date
+        $avgHours = null;
+        if ($total > 0) {
+            $totalHours = $processed->sum(
+                fn ($l) => $l->initial_issue_date && $l->processed_at
+                    ? $l->initial_issue_date->diffInHours($l->processed_at)
+                    : 0
+            );
+            $avgHours = round($totalHours / $total, 1);
+        }
+
+        $officer = User::find($officerId, ['id', 'first_name', 'last_name', 'email', 'role']);
+
+        return $this->successResponse([
+            'officer'              => $officer,
+            'total_processed'      => $total,
+            'by_status'            => $byStatus,
+            'avg_processing_hours' => $avgHours,
+        ], 200, 'Officer stats retrieved.');
+    }
 }
+

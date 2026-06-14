@@ -18,7 +18,7 @@ class AdminUserGroupController extends Controller
     /** GET /v1/admin/groups */
     public function index(): JsonResponse
     {
-        $groups = UserGroup::with('permissions')->get();
+        $groups = UserGroup::with('permissions', 'users')->get();
 
         return $this->successResponse($groups->map(fn ($g) => $this->formatGroup($g)), 200, 'Groups retrieved.');
     }
@@ -31,7 +31,7 @@ class AdminUserGroupController extends Controller
 
         $group = UserGroup::create($data);
 
-        return $this->successResponse($this->formatGroup($group->load('permissions')), 201, 'Group created.');
+        return $this->successResponse($this->formatGroup($group->load('permissions', 'users')), 201, 'Group created.');
     }
 
     /** GET /v1/admin/groups/show */
@@ -62,7 +62,7 @@ class AdminUserGroupController extends Controller
 
         $group->update($data);
 
-        return $this->successResponse($this->formatGroup($group->load('permissions')), 200, 'Group updated.');
+        return $this->successResponse($this->formatGroup($group->load('permissions', 'users')), 200, 'Group updated.');
     }
 
     /** DELETE /v1/admin/groups */
@@ -96,7 +96,7 @@ class AdminUserGroupController extends Controller
 
         $group->permissions()->sync($request->permission_ids);
 
-        return $this->successResponse($this->formatGroup($group->load('permissions')), 200, 'Group permissions updated.');
+        return $this->successResponse($this->formatGroup($group->load('permissions', 'users')), 200, 'Group permissions updated.');
     }
 
     /**
@@ -147,6 +147,13 @@ class AdminUserGroupController extends Controller
                 'name' => $p->name,
                 'slug' => $p->slug,
             ])->values(),
+            'members'     => $group->relationLoaded('users') ? $group->users->map(fn ($u) => [
+                'id'         => $u->id,
+                'first_name' => $u->first_name,
+                'last_name'  => $u->last_name,
+                'email'      => $u->email,
+                'role'       => $u->role,
+            ])->values() : [],
         ];
     }
 }

@@ -24,6 +24,8 @@ class Licence extends Model
         return [
             'user_id'                      => 'integer',
             'pickup_office_id'             => 'integer',
+            'processed_by'                 => 'integer',
+            'processed_at'                 => 'datetime',
             'initial_issue_date'           => 'date',
             'last_renewal_date'            => 'date',
             'expiry_date'                  => 'date',
@@ -39,6 +41,11 @@ class Licence extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function processedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'processed_by');
     }
 
     public function pickupOffice(): BelongsTo
