@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminRegionalOfficeController;
 use App\Http\Controllers\Api\V1\Admin\AdminUserGroupController;
 use App\Http\Controllers\Api\V1\Officer\OfficerApplicationController;
 use App\Http\Controllers\Api\V1\Officer\OfficerDashboardController;
+use App\Http\Controllers\Api\V1\Officer\OfficerEnrollmentController;
 use App\Http\Controllers\Api\V1\Officer\OfficerDeliveryController;
 use App\Http\Controllers\Api\V1\Officer\OfficerHandledApplicationsController;
 use App\Http\Controllers\Api\V1\Officer\OfficerRegionController;
@@ -30,6 +31,14 @@ Route::middleware(['auth:sanctum', 'role:officer,superadmin'])->prefix('v1/offic
     Route::post('/applications/claim',            [OfficerApplicationController::class, 'claim']);
     Route::post('/applications/unclaim',          [OfficerApplicationController::class, 'unclaim']);
     Route::post('/applications/process',          [OfficerApplicationController::class, 'process']);
+
+    // Enrollment + verification workflow
+    Route::post('/applications/enroll',               [OfficerEnrollmentController::class, 'enroll']);
+    Route::post('/enrollment/verify',                 [OfficerEnrollmentController::class, 'verify']);
+    Route::post('/enrollment/complete-verification',  [OfficerEnrollmentController::class, 'completeVerification']);
+    Route::post('/enrollment/escalate',               [OfficerEnrollmentController::class, 'escalate']);
+    Route::get('/enrollment/show',                    [OfficerEnrollmentController::class, 'show']);
+    Route::get('/audit',                              [OfficerEnrollmentController::class, 'auditLog']);
 
     // Applications handled by officer (permission: view_handled_applications)
     Route::get('/handled-applications',   [OfficerHandledApplicationsController::class, 'index']);
