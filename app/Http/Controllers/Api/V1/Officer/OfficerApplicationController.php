@@ -24,10 +24,10 @@ class OfficerApplicationController extends Controller
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
         ]);
 
-        $licences = Licence::with(['user', 'appointment.office'])
+        $licences = Licence::with(['user', 'appointment.office', 'processedBy'])
             ->where('processed_by', $request->user()->id)
             ->whereNull('processed_at')                    // not yet finalised
-            ->where('application_status', 'under_review')
+            ->whereIn('application_status', ['under_review', 'under_enrollment', 'discrepancy_flagged', 'escalated'])
             ->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))
             ->latest('updated_at')
             ->paginate($request->query('per_page', 20));
