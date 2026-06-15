@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminOfficerPermissionController;
 use App\Http\Controllers\Api\V1\Admin\AdminPermissionController;
 use App\Http\Controllers\Api\V1\Admin\AdminRegionalOfficeController;
 use App\Http\Controllers\Api\V1\Admin\AdminUserGroupController;
+use App\Http\Controllers\Api\V1\Officer\OfficerApplicationController;
 use App\Http\Controllers\Api\V1\Officer\OfficerDashboardController;
 use App\Http\Controllers\Api\V1\Officer\OfficerDeliveryController;
 use App\Http\Controllers\Api\V1\Officer\OfficerHandledApplicationsController;
@@ -23,6 +24,12 @@ Route::middleware(['auth:sanctum', 'role:officer,superadmin'])->prefix('v1/offic
     Route::get('/appointments/today',     [OfficerDashboardController::class, 'todayAppointments']);
     Route::get('/appointments',           [OfficerDashboardController::class, 'appointments']);
     Route::get('/stats',                  [OfficerDashboardController::class, 'stats']);
+
+    // Application queue / claim / process workflow
+    Route::get('/queue',                          [OfficerApplicationController::class, 'queue']);
+    Route::post('/applications/claim',            [OfficerApplicationController::class, 'claim']);
+    Route::post('/applications/unclaim',          [OfficerApplicationController::class, 'unclaim']);
+    Route::post('/applications/process',          [OfficerApplicationController::class, 'process']);
 
     // Applications handled by officer (permission: view_handled_applications)
     Route::get('/handled-applications',   [OfficerHandledApplicationsController::class, 'index']);

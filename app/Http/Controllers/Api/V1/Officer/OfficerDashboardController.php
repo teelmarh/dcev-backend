@@ -17,7 +17,8 @@ class OfficerDashboardController extends Controller
     public function applications(Request $request): JsonResponse
     {
         $licences = Licence::with(['user', 'appointment'])
-            ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
+            ->when($request->query('application_status'), fn ($q, $s) => $q->where('application_status', $s))
+            ->when($request->query('status'), fn ($q, $s) => $q->where('status', $s))
             ->when($request->query('type'), fn ($q, $type) => $q->where('type', $type))
             ->latest()
             ->paginate(20);

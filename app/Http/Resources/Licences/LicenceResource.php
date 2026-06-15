@@ -18,6 +18,7 @@ class LicenceResource extends JsonResource
             'family'             => $this->family,
             'type'               => $this->type,
             'application_type'   => $this->application_type,
+            'application_status' => $this->application_status,
             'licence_number'     => $this->licence_number,
             'initial_issue_date' => $this->initial_issue_date?->toDateString(),
             'last_renewal_date'  => $this->last_renewal_date?->toDateString(),
@@ -89,6 +90,15 @@ class LicenceResource extends JsonResource
                     'paid_at'        => $this->enrollmentTransaction->paid_at,
                 ] : null
             ),
+
+            // Processing outcome (officer-set fields)
+            'processed_by'    => $this->whenLoaded('processedBy', fn () => $this->processedBy ? [
+                'id'         => $this->processedBy->id,
+                'first_name' => $this->processedBy->first_name,
+                'last_name'  => $this->processedBy->last_name,
+            ] : null),
+            'processed_at'    => $this->processed_at?->toDateTimeString(),
+            'processing_notes' => $this->processing_notes,
 
             'created_at' => $this->created_at,
         ];
