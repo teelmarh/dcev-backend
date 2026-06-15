@@ -10,6 +10,7 @@ use App\Models\LicenceCabinCrewDetail;
 use App\Models\LicenceFlightDispatchDetail;
 use App\Models\LicencePilotDetail;
 use App\Models\RegionalOffice;
+use App\Models\EnrollmentVerification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -96,6 +97,11 @@ class Licence extends Model
     public function deliveryDetail(): HasOne
     {
         return $this->hasOne(LicenceDeliveryDetail::class);
+    }
+
+    public function enrollmentVerification(): HasOne
+    {
+        return $this->hasOne(EnrollmentVerification::class);
     }
 
     public function enrollmentTransaction(): BelongsTo
