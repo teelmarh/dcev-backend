@@ -25,7 +25,7 @@ class OfficerWelcomeNotification extends Notification
     {
         $cmMgr = new CustomMailerManager();
 
-        $setPasswordUrl = rtrim(config('app.url'), '/') . '/set-password?email=' . rawurlencode($this->officer->email);
+        $setPasswordUrl = rtrim(config('app.frontend_url'), '/') . '/set-password?email=' . rawurlencode($this->officer->email);
 
         return (new CustomMailMessage($cmMgr))
             ->from($cmMgr->getEmail(), $cmMgr->getName())
