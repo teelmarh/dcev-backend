@@ -30,6 +30,9 @@ class UserResource extends JsonResource
             'empic_address_id'   => $this->empic_address_id,
             'role'               => $this->role,
             'regional_office_id' => $this->regional_office_id,
+            'permissions'        => $this->role === 'superadmin'
+                ? ['*']
+                : $this->resolvedPermissionSlugs()->values(),
             'created_at'         => $this->created_at,
         ];
     }
