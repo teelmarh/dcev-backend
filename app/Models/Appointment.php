@@ -15,6 +15,7 @@ class Appointment extends Model
         'previous_date'  => 'date',
         'scheduled_time' => 'string',
         'previous_time'  => 'string',
+        'attended_at'    => 'datetime',
     ];
 
     public function user(): BelongsTo

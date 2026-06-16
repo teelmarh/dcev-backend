@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Officer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Appointments\AppointmentResource;
 use App\Http\Resources\Licences\LicenceResource;
 use App\Http\Resources\Officer\OfficerAppointmentResource;
 use App\Models\Appointment;
@@ -150,6 +151,40 @@ class OfficerDashboardController extends Controller
             'by_status'            => $byStatus,
             'avg_processing_hours' => $avgHours,
         ], 200, 'Officer stats retrieved.');
+    }
+
+    /**
+     * PATCH /v1/officer/appointments/mark-attended
+     * Body: appointment_id, attended (bool)
+     *
+     * Mark whether an applicant showed up for their appointment.
+     * Sets attended_at = now() when attended = true, null when attended = false.
+     * Only the office's assigned officer or superadmin can call this.
+     */
+    public function markAttended(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'appointment_id' => ['required', 'integer', 'exists:appointments,id'],
+            'attended'       => ['required', 'boolean'],
+        ]);
+
+        $appointment = Appointment::with('office')->find($data['appointment_id']);
+        $user        = $request->user();
+
+        // Officers can only mark attendance for their own office
+        if ($user->role !== 'superadmin' && $appointment->regional_office_id !== $user->regional_office_id) {
+            return $this->errorResponse('This appointment is not at your office.', 403);
+        }
+
+        $appointment->update([
+            'attended_at' => $data['attended'] ? now() : null,
+        ]);
+
+        return $this->successResponse(
+            new AppointmentResource($appointment->fresh('office')),
+            200,
+            $data['attended'] ? 'Applicant marked as attended.' : 'Attendance cleared.'
+        );
     }
 }
 

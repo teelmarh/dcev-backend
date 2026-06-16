@@ -18,6 +18,7 @@ class AppointmentResource extends JsonResource
             'previous_time'  => $this->previous_time,
             'status'         => $this->status,
             'notes'          => $this->notes,
+            'attended_at'    => $this->attended_at?->toISOString(),
             'office'         => new RegionalOfficeResource($this->whenLoaded('office')),
             'created_at'     => $this->created_at->toISOString(),
         ];
