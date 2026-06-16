@@ -129,6 +129,60 @@ class OfficerMetricsController extends Controller
         }
         $monthlyTrend = array_values($trendMap);
 
+        // ------------------------------------------------------------------
+        // 9. Per-region breakdown (only meaningful for national callers,
+        //    but always returned — regional caller just gets their one row)
+        // ------------------------------------------------------------------
+        $regions = RegionalOffice::select('id', 'name', 'state', 'city', 'is_pickup_location', 'active')
+            ->when(! $isNational, fn ($q) => $q->where('id', $officeId))
+            ->get()
+            ->map(function (RegionalOffice $office) use ($today) {
+                $oid = $office->id;
+
+                $applicants = Appointment::where('regional_office_id', $oid)
+                    ->distinct('user_id')->count('user_id');
+
+                $applications = Appointment::where('regional_office_id', $oid)
+                    ->distinct('licence_id')->count('licence_id');
+
+                $byStatusRegion = Licence::select('licences.application_status', DB::raw('COUNT(DISTINCT licences.id) as total'))
+                    ->join('appointments', 'appointments.licence_id', '=', 'licences.id')
+                    ->where('appointments.regional_office_id', $oid)
+                    ->groupBy('licences.application_status')
+                    ->pluck('total', 'application_status')
+                    ->map(fn ($v) => (int) $v);
+
+                $scheduled = Appointment::where('regional_office_id', $oid)
+                    ->whereIn('status', ['pending', 'confirmed'])
+                    ->whereDate('scheduled_date', '>=', $today)
+                    ->count();
+
+                $completed = Appointment::where('regional_office_id', $oid)
+                    ->where('status', 'completed')
+                    ->count();
+
+                $missed = Appointment::where('regional_office_id', $oid)
+                    ->whereDate('scheduled_date', '<', $today)
+                    ->whereNull('attended_at')
+                    ->whereNotIn('status', ['cancelled', 'completed'])
+                    ->count();
+
+                return [
+                    'office_id'              => $office->id,
+                    'name'                   => $office->name,
+                    'state'                  => $office->state,
+                    'city'                   => $office->city,
+                    'is_pickup_location'     => $office->is_pickup_location,
+                    'active'                 => $office->active,
+                    'total_applicants'       => $applicants,
+                    'total_applications'     => $applications,
+                    'applications_by_status' => $byStatusRegion,
+                    'scheduled_appointments' => $scheduled,
+                    'completed_appointments' => $completed,
+                    'missed_appointments'    => $missed,
+                ];
+            });
+
         return $this->successResponse([
             'scope'                  => $isNational ? 'national' : 'regional',
             'regional_office_id'     => $isNational ? null : $officeId,
@@ -144,6 +198,7 @@ class OfficerMetricsController extends Controller
                 'courier_count'  => $courierCount,
                 'monthly_trend'  => $monthlyTrend,
             ],
+            'regions'                => $regions,
         ], 200, 'Dashboard metrics retrieved.');
     }
 }

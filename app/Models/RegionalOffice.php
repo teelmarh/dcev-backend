@@ -10,8 +10,9 @@ class RegionalOffice extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'active'         => 'boolean',
-        'daily_capacity' => 'integer',
+        'active'              => 'boolean',
+        'is_pickup_location'  => 'boolean',
+        'daily_capacity'      => 'integer',
     ];
 
     public function appointments(): HasMany
