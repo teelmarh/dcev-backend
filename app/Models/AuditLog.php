@@ -29,6 +29,14 @@ class AuditLog extends Model
     }
 
     /**
+     * Convenience relation — only valid when subject_type = Licence.
+     */
+    public function licence(): BelongsTo
+    {
+        return $this->belongsTo(Licence::class, 'subject_id');
+    }
+
+    /**
      * Retrieve audit entries for a given subject model.
      */
     public function scopeForSubject($query, Model $subject): mixed

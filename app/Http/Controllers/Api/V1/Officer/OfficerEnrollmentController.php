@@ -291,7 +291,11 @@ class OfficerEnrollmentController extends Controller
             'per_page'   => ['sometimes', 'integer', 'min:1', 'max:100'],
         ]);
 
-        $query = AuditLog::with('user:id,first_name,last_name,email')
+        $query = AuditLog::with([
+                'user:id,first_name,last_name,email',
+                'licence:id,licence_number,user_id',
+                'licence.user:id,first_name,last_name',
+            ])
             ->latest();
 
         if ($user->role !== 'superadmin') {
@@ -307,9 +311,14 @@ class OfficerEnrollmentController extends Controller
 
         return $this->successResponse(
             $logs->through(fn ($entry) => [
-                'id'         => $entry->id,
-                'action'     => $entry->action,
-                'licence_id' => $entry->subject_type === Licence::class ? (int) $entry->subject_id : null,
+                'id'             => $entry->id,
+                'action'         => $entry->action,
+                'licence_id'     => $entry->subject_type === Licence::class ? (int) $entry->subject_id : null,
+                'licence_number' => $entry->subject_type === Licence::class ? $entry->licence?->licence_number : null,
+                'applicant'      => $entry->subject_type === Licence::class && $entry->licence?->user ? [
+                    'first_name' => $entry->licence->user->first_name,
+                    'last_name'  => $entry->licence->user->last_name,
+                ] : null,
                 'subject'    => ['type' => class_basename($entry->subject_type), 'id' => $entry->subject_id],
                 'officer'    => $entry->user ? [
                     'id'         => $entry->user->id,
