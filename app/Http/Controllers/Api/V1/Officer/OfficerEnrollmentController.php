@@ -111,11 +111,9 @@ class OfficerEnrollmentController extends Controller
         $verification->update($updateData);
 
         // Determine application_status side-effect
-        $actionLogged = AuditLogger::VERIFICATION_SAVED;
-
         if (array_key_exists('has_discrepancy', $updateData) && $updateData['has_discrepancy']) {
             $licence->update(['application_status' => 'discrepancy_flagged']);
-            $actionLogged = AuditLogger::DISCREPANCY_FLAGGED;
+            AuditLogger::log($user, AuditLogger::DISCREPANCY_FLAGGED, $licence, $updateData, $request);
         } elseif (
             array_key_exists('has_discrepancy', $updateData)
             && ! $updateData['has_discrepancy']
@@ -124,8 +122,6 @@ class OfficerEnrollmentController extends Controller
             // Officer cleared the discrepancy flag — return to under_enrollment
             $licence->update(['application_status' => 'under_enrollment']);
         }
-
-        AuditLogger::log($user, $actionLogged, $licence, $updateData, $request);
 
         return $this->successResponse(
             new EnrollmentVerificationResource($verification->fresh('officer')),

@@ -11,7 +11,6 @@ class AuditLogger
 {
     // Action constants — use these everywhere so action slugs stay consistent
     public const ENROLL_STARTED         = 'enroll_started';
-    public const VERIFICATION_SAVED     = 'verification_saved';
     public const DISCREPANCY_FLAGGED    = 'discrepancy_flagged';
     public const VERIFICATION_COMPLETE  = 'verification_complete';
     public const ESCALATED              = 'escalated';
