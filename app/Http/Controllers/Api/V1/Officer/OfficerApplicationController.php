@@ -117,6 +117,13 @@ class OfficerApplicationController extends Controller
             return $this->errorResponse('This application has already been finalised.', 422);
         }
 
+        if ($licence->application_status !== 'biometric_captured') {
+            return $this->errorResponse(
+                'Biometric capture must be completed before a final decision can be made. Current status: ' . $licence->application_status,
+                422
+            );
+        }
+
         $licence->update([
             'application_status' => $data['action'],
             'processed_by'       => $user->id,
