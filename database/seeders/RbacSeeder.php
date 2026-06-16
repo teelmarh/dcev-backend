@@ -57,6 +57,11 @@ class RbacSeeder extends Seeder
                 'slug'        => 'manage_delivery',
                 'description' => 'View delivery details and the full dispatch list for pickup and courier items',
             ],
+            [
+                'name'        => 'Capture Biometrics',
+                'slug'        => 'capture_biometrics',
+                'description' => 'Capture photo, fingerprint, and signature for an applicant during enrollment',
+            ],
         ];
 
         foreach ($permissions as $perm) {

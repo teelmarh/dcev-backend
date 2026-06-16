@@ -11,6 +11,7 @@ use App\Models\LicenceFlightDispatchDetail;
 use App\Models\LicencePilotDetail;
 use App\Models\RegionalOffice;
 use App\Models\EnrollmentVerification;
+use App\Models\BiometricCapture;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -102,6 +103,11 @@ class Licence extends Model
     public function enrollmentVerification(): HasOne
     {
         return $this->hasOne(EnrollmentVerification::class);
+    }
+
+    public function biometricCapture(): HasOne
+    {
+        return $this->hasOne(BiometricCapture::class);
     }
 
     public function enrollmentTransaction(): BelongsTo

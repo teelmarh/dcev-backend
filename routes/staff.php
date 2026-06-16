@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminPermissionController;
 use App\Http\Controllers\Api\V1\Admin\AdminRegionalOfficeController;
 use App\Http\Controllers\Api\V1\Admin\AdminUserGroupController;
 use App\Http\Controllers\Api\V1\Officer\OfficerApplicationController;
+use App\Http\Controllers\Api\V1\Officer\OfficerBiometricController;
 use App\Http\Controllers\Api\V1\Officer\OfficerDashboardController;
 use App\Http\Controllers\Api\V1\Officer\OfficerEnrollmentController;
 use App\Http\Controllers\Api\V1\Officer\OfficerDeliveryController;
@@ -51,6 +52,13 @@ Route::middleware(['auth:sanctum', 'role:officer,superadmin'])->prefix('v1/offic
     // Delivery / dispatch management (permission: manage_delivery)
     Route::get('/delivery/dispatch',      [OfficerDeliveryController::class, 'dispatch']);
     Route::get('/delivery/show',          [OfficerDeliveryController::class, 'show']);
+
+    // Biometric capture (permission: capture_biometrics)
+    Route::get('/biometrics/show',             [OfficerBiometricController::class, 'show']);
+    Route::post('/biometrics/photo',           [OfficerBiometricController::class, 'photo']);
+    Route::post('/biometrics/fingerprint',     [OfficerBiometricController::class, 'fingerprint']);
+    Route::post('/biometrics/signature',       [OfficerBiometricController::class, 'signature']);
+    Route::post('/biometrics/complete',        [OfficerBiometricController::class, 'complete']);
 });
 
 /*
