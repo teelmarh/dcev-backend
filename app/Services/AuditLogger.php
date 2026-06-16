@@ -17,6 +17,8 @@ class AuditLogger
     public const ESCALATED              = 'escalated';
     public const APPLICATION_PROCESSED  = 'application_processed';
     public const ENROLL_UNCLAIMED       = 'enroll_unclaimed';
+    public const APPLICATION_CLAIMED    = 'application_claimed';
+    public const APPLICATION_UNCLAIMED  = 'application_unclaimed';
 
     /**
      * Write an audit entry. Never throws — failure to log must not block the main operation.

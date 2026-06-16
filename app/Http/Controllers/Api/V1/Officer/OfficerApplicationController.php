@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Officer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Licences\LicenceResource;
 use App\Models\Licence;
+use App\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -69,6 +70,8 @@ class OfficerApplicationController extends Controller
             'processed_by'       => $request->user()->id,
         ]);
 
+        AuditLogger::log($request->user(), AuditLogger::APPLICATION_CLAIMED, $licence, [], $request);
+
         $licence->load($licence->detailRelationName(), 'user', 'appointment.office', 'deliveryDetail', 'enrollmentTransaction');
 
         return $this->successResponse(new LicenceResource($licence), 200, 'Application claimed. You are now reviewing it.');
@@ -119,6 +122,11 @@ class OfficerApplicationController extends Controller
             'processing_notes'   => $data['notes'] ?? null,
         ]);
 
+        AuditLogger::log($user, AuditLogger::APPLICATION_PROCESSED, $licence, [
+            'action' => $data['action'],
+            'notes'  => $data['notes'] ?? null,
+        ], $request);
+
         $licence->load($licence->detailRelationName(), 'user', 'processedBy');
 
         return $this->successResponse(new LicenceResource($licence), 200, "Application {$data['action']}.");
@@ -152,6 +160,8 @@ class OfficerApplicationController extends Controller
             'application_status' => 'submitted',
             'processed_by'       => null,
         ]);
+
+        AuditLogger::log($user, AuditLogger::APPLICATION_UNCLAIMED, $licence, [], $request);
 
         return $this->showMessage('Application returned to the unassigned pool.', 200);
     }

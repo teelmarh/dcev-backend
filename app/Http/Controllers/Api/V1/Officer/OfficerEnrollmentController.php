@@ -313,6 +313,7 @@ class OfficerEnrollmentController extends Controller
             $logs->through(fn ($entry) => [
                 'id'         => $entry->id,
                 'action'     => $entry->action,
+                'licence_id' => $entry->subject_type === Licence::class ? (int) $entry->subject_id : null,
                 'subject'    => ['type' => class_basename($entry->subject_type), 'id' => $entry->subject_id],
                 'officer'    => $entry->user ? [
                     'id'         => $entry->user->id,
