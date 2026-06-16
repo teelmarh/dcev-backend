@@ -14,15 +14,7 @@ use Illuminate\Http\Request;
 
 class OfficerEnrollmentController extends Controller
 {
-    /**
-     * POST /v1/officer/applications/enroll
-     * Permission: process_application
-     *
-     * Officer clicks "Enroll" — locks the application to themselves and opens
-     * an EnrollmentVerification record they can partially save as they work.
-     * Idempotent: if the same officer re-hits this endpoint, it returns the
-     * existing record without resetting any saved checks.
-     */
+     
     public function enroll(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -51,7 +43,6 @@ class OfficerEnrollmentController extends Controller
             return $this->errorResponse('This application has already been finalised.', 422);
         }
 
-        // Idempotent — only update if not already under_enrollment by this officer
         if ($licence->application_status !== 'under_enrollment' || $licence->processed_by !== $user->id) {
             $licence->update([
                 'application_status' => 'under_enrollment',
@@ -63,7 +54,6 @@ class OfficerEnrollmentController extends Controller
             ], $request);
         }
 
-        // Create verification record only if none exists — never reset saved checks
         $verification = EnrollmentVerification::firstOrCreate(
             ['licence_id' => $licence->id],
             ['officer_id' => $user->id]
@@ -81,8 +71,6 @@ class OfficerEnrollmentController extends Controller
      * POST /v1/officer/enrollment/verify
      * Permission: process_application
      *
-     * Save any subset of the 5 checklist items and/or discrepancy fields.
-     * Auto-saves on every toggle — officer can close tab mid-checklist and resume.
      */
     public function verify(Request $request): JsonResponse
     {
@@ -150,8 +138,6 @@ class OfficerEnrollmentController extends Controller
      * POST /v1/officer/enrollment/complete-verification
      * Permission: process_application
      *
-     * Officer clicks "Proceed" — all 5 checks must pass, no active discrepancy.
-     * Moves application_status to verification_complete so biometric capture can begin.
      */
     public function completeVerification(Request $request): JsonResponse
     {
