@@ -60,14 +60,16 @@ class OfficerBiometricController extends Controller
     /**
      * POST /v1/officer/biometrics/photo
      * Body (multipart): licence_id, photo (file — JPEG/PNG)
+     *  OR (JSON):       licence_id, photo_base64 (data URI)
      *
      * Upload or replace the applicant's webcam photo.
      */
     public function photo(Request $request): JsonResponse
     {
         $request->validate([
-            'licence_id' => ['required', 'integer', 'exists:licences,id'],
-            'photo'      => ['required', 'file', 'mimes:jpeg,jpg,png', 'max:5120'],
+            'licence_id'   => ['required', 'integer', 'exists:licences,id'],
+            'photo'        => ['required_without:photo_base64', 'file', 'mimes:jpeg,jpg,png', 'max:5120'],
+            'photo_base64' => ['required_without:photo', 'string'],
         ]);
 
         $licence = Licence::find($request->licence_id);
@@ -87,7 +89,12 @@ class OfficerBiometricController extends Controller
         }
 
         $storageService = new FileStorageService();
-        $path           = $storageService->storeUploadedFile($request->file('photo'), $capture);
+
+        if ($request->hasFile('photo')) {
+            $path = $storageService->storeUploadedFile($request->file('photo'), $capture);
+        } else {
+            $path = $storageService->storeBase64File($request->input('photo_base64'), $capture);
+        }
 
         $capture->update(['photo_path' => $path]);
 
