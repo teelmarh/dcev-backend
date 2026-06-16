@@ -21,8 +21,10 @@ return new class extends Migration
                 ->noActionOnDelete();
 
             $table->string('photo_path')->nullable();
-            $table->text('left_index_wsq')->nullable();   // base64 WSQ fingerprint
-            $table->text('right_index_wsq')->nullable();  // base64 WSQ fingerprint
+            $table->text('left_index_wsq')->nullable();   
+            $table->text('right_index_wsq')->nullable();  
+            $table->text('left_thumb_wsq')->nullable();
+            $table->text('right_thumb_wsq')->nullable();
             $table->string('signature_path')->nullable();
 
             $table->timestamp('completed_at')->nullable();

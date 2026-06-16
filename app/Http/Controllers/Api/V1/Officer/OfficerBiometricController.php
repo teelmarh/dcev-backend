@@ -113,21 +113,28 @@ class OfficerBiometricController extends Controller
 
     /**
      * POST /v1/officer/biometrics/fingerprint
-     * Body (JSON): licence_id, left_index_wsq (base64), right_index_wsq (base64)
+     * Body (JSON): licence_id + any combination of the 4 WSQ fields
      *
-     * Store WSQ fingerprint data from Digital Persona device.
-     * Either or both fingers can be submitted in one call.
+     * Captures left thumb, left index, right thumb, right index from Digital Persona.
+     * At least one finger must be provided per call. Can be sent in multiple calls.
      */
     public function fingerprint(Request $request): JsonResponse
     {
         $data = $request->validate([
             'licence_id'       => ['required', 'integer', 'exists:licences,id'],
+            'left_thumb_wsq'   => ['sometimes', 'nullable', 'string'],
             'left_index_wsq'   => ['sometimes', 'nullable', 'string'],
+            'right_thumb_wsq'  => ['sometimes', 'nullable', 'string'],
             'right_index_wsq'  => ['sometimes', 'nullable', 'string'],
         ]);
 
-        if (! isset($data['left_index_wsq']) && ! isset($data['right_index_wsq'])) {
-            return $this->errorResponse('Provide at least one fingerprint (left_index_wsq or right_index_wsq).', 422);
+        $fingerFields = ['left_thumb_wsq', 'left_index_wsq', 'right_thumb_wsq', 'right_index_wsq'];
+
+        if (! collect($fingerFields)->contains(fn ($f) => isset($data[$f]))) {
+            return $this->errorResponse(
+                'Provide at least one fingerprint (left_thumb_wsq, left_index_wsq, right_thumb_wsq, or right_index_wsq).',
+                422
+            );
         }
 
         $licence = Licence::find($data['licence_id']);
@@ -141,7 +148,7 @@ class OfficerBiometricController extends Controller
             ['captured_by' => $request->user()->id]
         );
 
-        $update = collect($data)->only(['left_index_wsq', 'right_index_wsq'])->toArray();
+        $update = collect($data)->only($fingerFields)->toArray();
         $capture->update($update);
 
         return $this->successResponse(
@@ -223,7 +230,9 @@ class OfficerBiometricController extends Controller
         if (! $capture || ! $capture->isComplete()) {
             $missing = [];
             if (! $capture?->photo_path)       $missing[] = 'photo';
+            if (! $capture?->left_thumb_wsq)   $missing[] = 'left thumb fingerprint';
             if (! $capture?->left_index_wsq)   $missing[] = 'left index fingerprint';
+            if (! $capture?->right_thumb_wsq)  $missing[] = 'right thumb fingerprint';
             if (! $capture?->right_index_wsq)  $missing[] = 'right index fingerprint';
             if (! $capture?->signature_path)   $missing[] = 'signature';
 

@@ -62,6 +62,16 @@ class RbacSeeder extends Seeder
                 'slug'        => 'capture_biometrics',
                 'description' => 'Capture photo, fingerprint, and signature for an applicant during enrollment',
             ],
+            [
+                'name'        => 'View National Stats',
+                'slug'        => 'view_national_stats',
+                'description' => 'View dashboard metrics across all regional offices (not restricted to own office)',
+            ],
+            [
+                'name'        => 'Print Management',
+                'slug'        => 'print_management',
+                'description' => 'View ready cards, manage dispatch, and send collection/dispatch notifications to applicants',
+            ],
         ];
 
         foreach ($permissions as $perm) {

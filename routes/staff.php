@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Officer\OfficerMetricsController;
+use App\Http\Controllers\Api\V1\Officer\OfficerCardsController;
 use App\Http\Controllers\Api\V1\Admin\AdminOfficerController;
 use App\Http\Controllers\Api\V1\Admin\AdminOfficerPermissionController;
 use App\Http\Controllers\Api\V1\Admin\AdminPermissionController;
@@ -21,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::middleware(['auth:sanctum', 'role:officer,superadmin'])->prefix('v1/officer')->group(function () {
     // Dashboard
+    Route::get('/metrics',                [OfficerMetricsController::class, 'index']);
     Route::get('/applications',           [OfficerDashboardController::class, 'applications']);
     Route::get('/applications/show',      [OfficerDashboardController::class, 'showApplication']);
     Route::get('/appointments/today',     [OfficerDashboardController::class, 'todayAppointments']);
@@ -59,6 +62,10 @@ Route::middleware(['auth:sanctum', 'role:officer,superadmin'])->prefix('v1/offic
     Route::post('/biometrics/fingerprint',     [OfficerBiometricController::class, 'fingerprint']);
     Route::post('/biometrics/signature',       [OfficerBiometricController::class, 'signature']);
     Route::post('/biometrics/complete',        [OfficerBiometricController::class, 'complete']);
+
+    // Cards / print management (permission: print_management)
+    Route::get('/cards',         [OfficerCardsController::class, 'index']);
+    Route::post('/cards/notify', [OfficerCardsController::class, 'notify']);
 });
 
 /*

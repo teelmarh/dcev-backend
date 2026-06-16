@@ -21,7 +21,9 @@ class BiometricCaptureResource extends JsonResource
             'photo_url'        => $this->photo_path
                 ? Storage::disk('public')->url($this->photo_path)
                 : null,
+            'left_thumb_wsq'   => $this->left_thumb_wsq,
             'left_index_wsq'   => $this->left_index_wsq,
+            'right_thumb_wsq'  => $this->right_thumb_wsq,
             'right_index_wsq'  => $this->right_index_wsq,
             'signature_url'    => $this->signature_path
                 ? Storage::disk('public')->url($this->signature_path)

@@ -31,7 +31,9 @@ class BiometricCapture extends Model
     public function isComplete(): bool
     {
         return $this->photo_path !== null
+            && $this->left_thumb_wsq !== null
             && $this->left_index_wsq !== null
+            && $this->right_thumb_wsq !== null
             && $this->right_index_wsq !== null
             && $this->signature_path !== null;
     }

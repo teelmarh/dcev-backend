@@ -8,6 +8,7 @@ use App\Models\Licence;
 use App\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class OfficerApplicationController extends Controller
 {
@@ -130,6 +131,19 @@ class OfficerApplicationController extends Controller
             'processed_at'       => now(),
             'processing_notes'   => $data['notes'] ?? null,
         ]);
+
+        // On approval: complete the appointment + generate pickup code if applicable
+        if ($data['action'] === 'approved') {
+            $licence->appointment()->update(['status' => 'completed']);
+
+            if ($licence->delivery_method === 'pickup' && ! $licence->pickup_code) {
+                do {
+                    $code = strtoupper(Str::random(8));
+                } while (Licence::where('pickup_code', $code)->exists());
+
+                $licence->update(['pickup_code' => $code]);
+            }
+        }
 
         AuditLogger::log($user, AuditLogger::APPLICATION_PROCESSED, $licence, [
             'action' => $data['action'],
