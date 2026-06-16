@@ -68,7 +68,7 @@ class OfficerBiometricController extends Controller
     {
         $request->validate([
             'licence_id'   => ['required', 'integer', 'exists:licences,id'],
-            'photo'        => ['required_without:photo_base64', 'file', 'mimes:jpeg,jpg,png', 'max:5120'],
+            'photo'        => ['required_without:photo_base64'],
             'photo_base64' => ['required_without:photo', 'string'],
         ]);
 
@@ -83,17 +83,23 @@ class OfficerBiometricController extends Controller
             ['captured_by' => $request->user()->id]
         );
 
-        // Delete old photo if exists
         if ($capture->photo_path) {
             Storage::disk('public')->delete($capture->photo_path);
         }
 
         $storageService = new FileStorageService();
 
+        // Accept file upload, base64 in photo_base64, or base64 string in photo field
         if ($request->hasFile('photo')) {
-            $path = $storageService->storeUploadedFile($request->file('photo'), $capture);
+            $file = $request->file('photo');
+            if (! in_array($file->getMimeType(), ['image/jpeg', 'image/jpg', 'image/png'])) {
+                return $this->errorResponse('Photo must be a JPEG or PNG image.', 422);
+            }
+            $path = $storageService->storeUploadedFile($file, $capture);
         } else {
-            $path = $storageService->storeBase64File($request->input('photo_base64'), $capture);
+            // Either photo_base64 or photo sent as a base64 string
+            $b64  = $request->input('photo_base64') ?? $request->input('photo');
+            $path = $storageService->storeBase64File($b64, $capture);
         }
 
         $capture->update(['photo_path' => $path]);
