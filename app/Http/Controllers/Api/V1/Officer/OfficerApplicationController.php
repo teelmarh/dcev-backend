@@ -70,6 +70,9 @@ class OfficerApplicationController extends Controller
             'processed_by'       => $request->user()->id,
         ]);
 
+        // Applicant is physically present — stamp their appointment as attended
+        $licence->appointment()->whereNull('attended_at')->update(['attended_at' => now()]);
+
         AuditLogger::log($request->user(), AuditLogger::APPLICATION_CLAIMED, $licence, [], $request);
 
         $licence->load($licence->detailRelationName(), 'user', 'appointment.office', 'deliveryDetail', 'enrollmentTransaction');
@@ -160,6 +163,9 @@ class OfficerApplicationController extends Controller
             'application_status' => 'submitted',
             'processed_by'       => null,
         ]);
+
+        // Applicant is no longer confirmed present — clear the attendance stamp
+        $licence->appointment()->update(['attended_at' => null]);
 
         AuditLogger::log($user, AuditLogger::APPLICATION_UNCLAIMED, $licence, [], $request);
 
