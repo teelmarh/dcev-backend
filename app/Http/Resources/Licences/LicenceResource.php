@@ -66,12 +66,13 @@ class LicenceResource extends JsonResource
 
             // --- Officer-facing fields (only present when officer endpoint loads these relations) ---
             'applicant' => $this->whenLoaded('user', fn () => [
-                'id'         => $this->user->id,
-                'first_name' => $this->user->first_name,
-                'last_name'  => $this->user->last_name,
-                'email'      => $this->user->email,
-                'phone'      => $this->user->phone,
-                'nin'        => $this->user->nin,
+                'id'            => $this->user->id,
+                'first_name'    => $this->user->first_name,
+                'last_name'     => $this->user->last_name,
+                'email'         => $this->user->email,
+                'phone'         => $this->user->phone,
+                'nin'           => $this->user->nin,
+                'date_of_birth' => $this->user->date_of_birth?->toDateString(),
             ]),
 
             'delivery' => $this->whenLoaded('deliveryDetail', fn () => $this->deliveryDetail ? [
