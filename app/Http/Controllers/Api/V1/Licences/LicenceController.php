@@ -23,7 +23,7 @@ class LicenceController extends Controller
             ->paginate(20);
 
         $licences->each(function (Licence $licence) {
-            $licence->load($licence->detailRelationName(), 'appointment.office');
+            $licence->load($licence->detailRelationName(), 'appointment.office', 'user');
         });
 
         return $this->dataResponse(
@@ -49,7 +49,7 @@ class LicenceController extends Controller
             return $this->errorResponse('This licence does not belong to your account.', 403);
         }
 
-        $licence->load($licence->detailRelationName(), 'appointment.office');
+        $licence->load($licence->detailRelationName(), 'appointment.office', 'user');
 
         return $this->dataResponse(new LicenceResource($licence), 'Licence retrieved.', true, 200);
     }

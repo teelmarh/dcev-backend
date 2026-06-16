@@ -48,7 +48,7 @@ class LicenceResource extends JsonResource
             // identification
             'id_form'   => $this->id_form,
             'id_number' => $this->id_number,
-            'nin_photo'=>$this->nin_photo,
+            'nin_photo' => $this->user?->nin_photo,
 
             // uploaded documents
             'licence_document_url' => $this->licence_document_path
