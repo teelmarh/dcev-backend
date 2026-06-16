@@ -71,6 +71,7 @@ class LicenceResource extends JsonResource
                 'last_name'     => $this->user->last_name,
                 'email'         => $this->user->email,
                 'phone'         => $this->user->phone,
+                'gender'        => $this->user->gender,
                 'nin'           => $this->user->nin,
                 'date_of_birth' => $this->user->date_of_birth?->toDateString(),
             ]),
