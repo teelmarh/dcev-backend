@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\V1\Users\Auth;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Services\AuditLogger;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\Users\UserResource;
 use App\Http\Requests\User\Auth\LoginFormRequest;
@@ -25,7 +26,8 @@ class LoginController extends Controller
         }
     
         $token = $user->createToken('auth_token', ['role:user'])->plainTextToken;
-        
+
+        AuditLogger::log($user, AuditLogger::LOGIN, $user, [], $request);
 
         $response = [
             'user' => new UserResource($user),

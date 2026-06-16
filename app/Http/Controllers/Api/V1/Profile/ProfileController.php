@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Profile;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\AuditLogger;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\Users\UserResource;
 use App\Services\ProcessDocument\ProcessMediaService;
@@ -48,6 +49,10 @@ class ProfileController extends Controller
         }
 
         $user->update($updateData);
+
+        AuditLogger::log($user, AuditLogger::PROFILE_UPDATED, $user, [
+            'fields_changed' => array_keys($updateData),
+        ], $request);
 
         return $this->dataResponse(
             new UserResource($user->fresh()),

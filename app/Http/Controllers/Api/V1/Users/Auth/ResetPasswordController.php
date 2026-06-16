@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Users\Auth;
 
 use App\Models\User;
+use App\Services\AuditLogger;
 use App\Traits\Api\OtpTraits;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\Auth\ResetPasswordRequest;
@@ -31,6 +32,8 @@ class ResetPasswordController extends Controller
         }
 
         User::where('email', $request['email'])->update(['password' => bcrypt($request['password'])]);
+
+        AuditLogger::log($user, AuditLogger::PASSWORD_RESET, $user, [], $request);
 
         return $this->showMessage('Your password has been changed! . Please login with your email and new password', 200);
     }

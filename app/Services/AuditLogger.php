@@ -19,6 +19,10 @@ class AuditLogger
     public const ENROLL_UNCLAIMED       = 'enroll_unclaimed';
     public const APPLICATION_CLAIMED    = 'application_claimed';
     public const APPLICATION_UNCLAIMED  = 'application_unclaimed';
+    public const LOGIN                  = 'login';
+    public const LOGOUT                 = 'logout';
+    public const PASSWORD_RESET         = 'password_reset';
+    public const PROFILE_UPDATED        = 'profile_updated';
 
     /**
      * Write an audit entry. Never throws — failure to log must not block the main operation.
