@@ -44,6 +44,7 @@ class OfficerDashboardController extends Controller
             'appointment.office',
             'deliveryDetail',
             'enrollmentTransaction',
+            'processedBy',
         ])->find($request->licence_id);
 
         if (! $licence) {
