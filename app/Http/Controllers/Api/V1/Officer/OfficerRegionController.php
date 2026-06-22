@@ -12,8 +12,6 @@ class OfficerRegionController extends Controller
 {
     /**
      * GET /v1/officer/regions
-     * Permission: oversee_regions
-     *
      * Returns all active regions with today's booking metrics.
      * Optional ?date=YYYY-MM-DD to see metrics for a specific date.
      */
@@ -35,6 +33,7 @@ class OfficerRegionController extends Controller
                 'state'               => $region->state,
                 'city'                => $region->city,
                 'active'              => $region->active,
+                'is_pickup_location'  => $region->is_pickup_location,
                 'daily_capacity'      => $capacity,
                 'working_hours_start' => $region->working_hours_start,
                 'working_hours_end'   => $region->working_hours_end,

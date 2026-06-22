@@ -121,6 +121,7 @@ class AdminRegionalOfficeController extends Controller
             'working_hours_start' => $region->working_hours_start,
             'working_hours_end'   => $region->working_hours_end,
             'active'              => $region->active,
+            'is_pickup_location'  => $region->is_pickup_location,
             'created_at'          => $region->created_at,
         ];
     }
