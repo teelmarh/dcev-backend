@@ -14,8 +14,6 @@ return new class extends Migration
             $table->timestamp('notified_at')->nullable()->after('pickup_code');
         });
 
-        // SQL Server does not allow a standard unique index with multiple NULLs.
-        // Use a filtered unique index that only applies when pickup_code is not null.
         DB::statement(
             'CREATE UNIQUE INDEX licences_pickup_code_unique ON licences (pickup_code) WHERE pickup_code IS NOT NULL'
         );
