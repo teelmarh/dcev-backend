@@ -123,6 +123,20 @@ class Licence extends Model
     /**
      * Returns the correct detail relation name for this licence's type.
      */
+    public function typeLabel(): string
+    {
+        return match ($this->type) {
+            'pilot'           => 'Pilot Licence',
+            'cabin_crew'      => 'Cabin Crew Licence',
+            'flight_dispatch' => 'Flight Dispatcher Licence',
+            'atc'             => 'ATC Licence',
+            'atsep'           => 'ATSEP Licence',
+            'aso'             => 'ASO Licence',
+            'ame'             => 'AME Licence',
+            default           => ucwords(str_replace('_', ' ', $this->type)) . ' Licence',
+        };
+    }
+
     public function detailRelationName(): string
     {
         return match ($this->type) {
