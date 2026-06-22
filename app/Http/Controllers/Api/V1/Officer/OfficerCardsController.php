@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Officer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Officer\OfficerCardsIndexRequest;
+use App\Http\Requests\Officer\OfficerCardsNotifyRequest;
 use App\Models\Licence;
 use App\Notifications\User\LicenceDispatchedCourierNotification;
 use App\Notifications\User\LicenceReadyPickupNotification;
@@ -13,25 +15,16 @@ class OfficerCardsController extends Controller
 {
     /**
      * GET /v1/officer/cards
-     * Permission: print_management
      *
      * Lists all approved licences (cards ready for collection or dispatch).
      * Split by delivery_method. Scoped to officer's office unless national.
      *
-     * Query params:
-     *   delivery_method  pickup|delivery (optional)
-     *   per_page         default 20
      */
-    public function index(Request $request): JsonResponse
+    public function index(OfficerCardsIndexRequest $request): JsonResponse
     {
         if (! $this->canManagePrint($request)) {
             return $this->errorResponse('You do not have permission to manage print and dispatch.', 403);
         }
-
-        $request->validate([
-            'delivery_method' => ['sometimes', 'string', 'in:pickup,delivery'],
-            'per_page'        => ['sometimes', 'integer', 'min:1', 'max:100'],
-        ]);
 
         $isNational = $request->user()->role === 'superadmin'
             || $request->user()->hasPermission('view_national_stats');
@@ -59,7 +52,6 @@ class OfficerCardsController extends Controller
 
         $paginated = $query->paginate($request->query('per_page', 20));
 
-        // Summary counts (unaffected by delivery_method filter)
         $summaryQuery = Licence::where('application_status', 'approved')
             ->when(
                 ! $isNational,
@@ -94,15 +86,11 @@ class OfficerCardsController extends Controller
      *
      * Can be called multiple times (resend). Stamps notified_at each time.
      */
-    public function notify(Request $request): JsonResponse
+    public function notify(OfficerCardsNotifyRequest $request): JsonResponse
     {
         if (! $this->canManagePrint($request)) {
             return $this->errorResponse('You do not have permission to manage print and dispatch.', 403);
         }
-
-        $request->validate([
-            'licence_id' => ['required', 'integer', 'exists:licences,id'],
-        ]);
 
         $licence = Licence::with(['user', 'pickupOffice', 'deliveryDetail', 'appointment'])
             ->find($request->licence_id);

@@ -3,26 +3,22 @@
 namespace App\Http\Controllers\Api\V1\Officer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Officer\OfficerMetricsRequest;
 use App\Models\Appointment;
 use App\Models\Licence;
 use App\Models\RegionalOffice;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 class OfficerMetricsController extends Controller
 {
     /**
      * GET /v1/officer/metrics
      *
-     * Returns dashboard metrics for the authenticated officer.
-     *
-     * Scope rules:
-     *  - Superadmin              → always national (all regions)
-     *  - view_national_stats     → national (all regions)
-     *  - Everyone else           → restricted to their assigned regional_office_id
+     * Scope: superadmin / view_national_stats → national. Everyone else → own office.
      */
-    public function index(Request $request): JsonResponse
+    public function index(OfficerMetricsRequest $request): JsonResponse
     {
         $user = $request->user();
 
